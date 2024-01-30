@@ -18,6 +18,9 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        nunito: ["var(--font-nunito)"]
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
