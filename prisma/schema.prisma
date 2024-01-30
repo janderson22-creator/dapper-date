@@ -28,7 +28,7 @@ model Establishment {
 model Service {
   id              String        @id @default(uuid())
   name            String
-  Price           Decimal       @db.Decimal(10, 2)
+  price           Decimal       @db.Decimal(10, 2)
   establishmentId String
   establishment   Establishment @relation(fields: [establishmentId], references: [id])
   description     String
