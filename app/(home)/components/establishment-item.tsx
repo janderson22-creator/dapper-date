@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/app/components/ui/card";
 import { Establishment } from "@prisma/client";
 import { StarIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface EstablishmentProps {
   establishment: Establishment;
@@ -14,7 +15,10 @@ const EstablishmentItem: React.FC<EstablishmentProps> = ({ establishment }) => {
     <Card className="min-w-[167px] max-w-[167px] rounded-2xl">
       <CardContent className="p-0">
         <div className="p-1 relative">
-          <Badge variant="secondary" className="opacity-90 flex items-center gap-1 absolute left-3 top-3 z-10">
+          <Badge
+            variant="secondary"
+            className="opacity-90 flex items-center gap-1 absolute left-3 top-3 z-10"
+          >
             <StarIcon className="fill-primary text-primary" size={12} />
             <span>5,0</span>
           </Badge>
@@ -35,9 +39,11 @@ const EstablishmentItem: React.FC<EstablishmentProps> = ({ establishment }) => {
           <p className="text-sm text-gray-400 overflow-hidden text-ellipsis text-nowrap">
             {establishment.address}
           </p>
-          <Button className="w-full mt-3" variant="secondary">
-            Reservar
-          </Button>
+          <Link href={`/establishments/${establishment.id}`}>
+            <Button className="w-full mt-3" variant="secondary">
+              Reservar
+            </Button>
+          </Link>
         </div>
       </CardContent>
     </Card>
