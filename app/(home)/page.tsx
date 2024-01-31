@@ -3,8 +3,14 @@ import Header from "../components/header";
 import { ptBR } from "date-fns/locale";
 import Search from "./components/search";
 import BookingItem from "../components/booking-item";
+import { db } from "../lib/prisma";
+import EstablishmentItem from "./components/establishment-item";
+import { Key } from "react";
+import { Establishment } from "@prisma/client";
 
-export default function Home() {
+export default async function Home() {
+  const establishments = await db.establishment.findMany({});
+
   return (
     <div>
       <Header />
@@ -27,6 +33,20 @@ export default function Home() {
           Agendamentos
         </h2>
         <BookingItem />
+      </div>
+
+      <div className="mt-6">
+        <h2 className="px-5 text-xs uppercase text-gray-400 font-bold mb-3">
+          Recomendados
+        </h2>
+
+        <div className="flex px-5 gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+          {establishments.map(
+            (establishment: Establishment, key: Key | null | undefined) => (
+              <EstablishmentItem key={key} establishment={establishment} />
+            )
+          )}
+        </div>
       </div>
     </div>
   );
