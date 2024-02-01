@@ -3,6 +3,8 @@ import EstablishmentInfo from "./components/establishment-info";
 import ServiceItem from "./components/service-item";
 import { Key } from "react";
 import { Establishment, Service } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 interface EstablishmentDetailsPageProps {
   params: {
@@ -13,6 +15,8 @@ interface EstablishmentDetailsPageProps {
 const EstablishmentDetailsPage: React.FC<
   EstablishmentDetailsPageProps
 > = async ({ params }) => {
+  const session = await getServerSession(authOptions);
+
   if (!params.id) {
     // TODO: redirect to home page
     return null;
@@ -39,7 +43,11 @@ const EstablishmentDetailsPage: React.FC<
       <div className="flex flex-col gap-3 px-5 pt-6">
         {establishment.services?.map(
           (service: Service, index: Key | null | undefined) => (
-            <ServiceItem key={index} service={service} />
+            <ServiceItem
+              key={index}
+              service={service}
+              isAuthenticated={!!session?.user}
+            />
           )
         )}
       </div>

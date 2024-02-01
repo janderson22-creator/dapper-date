@@ -17,7 +17,7 @@ const EstablishmentInfo: React.FC<Establishment> = ({ establishment }) => {
     <div>
       <div className="h-[250px] w-full relative">
         <Button
-          onClick={() => router.back()}
+          onClick={() => router.replace("/")}
           size="icon"
           variant="outline"
           className="absolute z-50 top-4 left-4"
