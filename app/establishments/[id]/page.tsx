@@ -1,7 +1,4 @@
-import { Button } from "@/app/components/ui/button";
 import { db } from "@/app/lib/prisma";
-import { ChevronLeftIcon, MapPinIcon, MenuIcon, StarIcon } from "lucide-react";
-import Image from "next/image";
 import EstablishmentInfo from "./components/establishment-info";
 import ServiceItem from "./components/service-item";
 import { Key } from "react";
