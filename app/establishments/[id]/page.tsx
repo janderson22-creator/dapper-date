@@ -46,6 +46,7 @@ const EstablishmentDetailsPage: React.FC<
             <ServiceItem
               key={index}
               service={service}
+              establishment={establishment}
               isAuthenticated={!!session?.user}
             />
           )
