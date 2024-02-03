@@ -15,11 +15,13 @@ import { Establishment, Service } from "@prisma/client";
 import { ptBR } from "date-fns/locale";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { generateDayTimeList } from "../helpers/hours";
 import { format, setHours, setMinutes } from "date-fns";
 import { saveBooking } from "../actions/save-booking";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ServiceItemProps {
   establishment: Establishment;
@@ -32,10 +34,12 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   service,
   isAuthenticated,
 }) => {
+  const router = useRouter()
   const { data } = useSession();
   const [date, setDate] = useState<Date | undefined>();
   const [hour, setHour] = useState<string | undefined>();
   const [submitIsLoading, setSubmitIsLoading] = useState(false);
+  const [sheetIsOpen, setSheetIsOpen] = useState(false);
 
   const dateClick = (date: Date | undefined) => {
     setDate(date);
@@ -65,12 +69,25 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
         date: newDate,
         userId: (data.user as any).id,
       });
+
+      setSheetIsOpen(false);
+      setHour(undefined)
+      setDate(undefined)
+      toast("Reserva realizada com sucesso!", {
+        description: format(newDate, "'Para' dd 'de' MMMM 'ás' HH':'mm'.'", {
+          locale: ptBR,
+        }),
+        action: {
+          label: "Visualizar",
+          onClick: () => router.push("/bookings"),
+        },
+      });
     } catch (error) {
       console.error(error);
     } finally {
       setSubmitIsLoading(false);
     }
-  }, [data?.user, date, establishment.id, hour, service.id]);
+  }, [data?.user, date, establishment.id, hour, router, service.id]);
 
   const timeList = useMemo(() => {
     return date ? generateDayTimeList(date) : [];
@@ -99,7 +116,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                 currency: "BRL",
               }).format(Number(service.price))}
             </p>
-            <Sheet>
+            <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
               <SheetTrigger asChild>
                 <Button onClick={bookingClick} variant="secondary">
                   Reservar
