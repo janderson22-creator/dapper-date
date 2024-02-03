@@ -31,6 +31,7 @@ const EstablishmentDetailsPage: React.FC<
     },
   });
 
+
   if (!establishment) {
     // TODO: redirect to home page
     return null;
