@@ -31,6 +31,7 @@ const EstablishmentDetailsPage: React.FC<
     },
   });
 
+
   if (!establishment) {
     // TODO: redirect to home page
     return null;
@@ -46,6 +47,7 @@ const EstablishmentDetailsPage: React.FC<
             <ServiceItem
               key={index}
               service={service}
+              establishment={establishment}
               isAuthenticated={!!session?.user}
             />
           )
