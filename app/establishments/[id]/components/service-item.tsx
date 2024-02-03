@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/app/components/ui/sheet";
-import { Establishment, Service } from "@prisma/client";
+import { Booking, Establishment, Service } from "@prisma/client";
 import { ptBR } from "date-fns/locale";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -22,6 +22,7 @@ import { saveBooking } from "../actions/save-booking";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { getDayBookings } from "../actions/get-day-bookings";
 
 interface ServiceItemProps {
   establishment: Establishment;
@@ -34,12 +35,25 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   service,
   isAuthenticated,
 }) => {
-  const router = useRouter()
+  const router = useRouter();
   const { data } = useSession();
   const [date, setDate] = useState<Date | undefined>();
   const [hour, setHour] = useState<string | undefined>();
   const [submitIsLoading, setSubmitIsLoading] = useState(false);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
+  const [dayBookings, setDayBookings] = useState<Booking>([]);
+
+  useEffect(() => {
+    if (!date) return;
+
+    const refreshAvailableHours = async () => {
+      const bookingsDay = await getDayBookings(date, establishment.id);
+
+      setDayBookings(bookingsDay);
+    };
+
+    refreshAvailableHours();
+  }, [date, establishment.id]);
 
   const dateClick = (date: Date | undefined) => {
     setDate(date);
@@ -71,8 +85,8 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
       });
 
       setSheetIsOpen(false);
-      setHour(undefined)
-      setDate(undefined)
+      setHour(undefined);
+      setDate(undefined);
       toast("Reserva realizada com sucesso!", {
         description: format(newDate, "'Para' dd 'de' MMMM 'ás' HH':'mm'.'", {
           locale: ptBR,
@@ -90,8 +104,26 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   }, [data?.user, date, establishment.id, hour, router, service.id]);
 
   const timeList = useMemo(() => {
-    return date ? generateDayTimeList(date) : [];
-  }, [date]);
+    if (!date) return [];
+
+    return generateDayTimeList(date).filter((time) => {
+      const timeHour = Number(time.split(":")[0]);
+      const timeMinutes = Number(time.split(":")[1]);
+
+      const bookingList = dayBookings.find((booking: Booking) => {
+        const bookingHour = booking?.date.getHours();
+        const bookingMinutes = booking?.date.getMinutes();
+
+        return bookingHour === timeHour && bookingMinutes === timeMinutes;
+      });
+
+      if (!bookingList) {
+        return true;
+      }
+
+      return false;
+    });
+  }, [date, dayBookings]);
 
   return (
     <Card>
