@@ -14,7 +14,7 @@ interface BookingItemProps {
 
 const BookingItem: React.FC<BookingItemProps> = ({ booking }) => {
   return (
-    <Card onClick={() => console.log(booking)}>
+    <Card className="min-w-[90%]">
       <CardContent className="flex justify-between p-0">
         <div className="flex flex-col gap-2 py-5 pl-5">
           <Badge
