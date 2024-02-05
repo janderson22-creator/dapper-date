@@ -18,7 +18,6 @@ const EstablishmentDetailsPage: React.FC<
   const session = await getServerSession(authOptions);
 
   if (!params.id) {
-    // TODO: redirect to home page
     return null;
   }
 
@@ -33,7 +32,6 @@ const EstablishmentDetailsPage: React.FC<
 
 
   if (!establishment) {
-    // TODO: redirect to home page
     return null;
   }
 
