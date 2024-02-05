@@ -15,26 +15,32 @@ export default async function Home() {
 
   const [establishments, confirmedBookings] = await Promise.all([
     db.establishment.findMany({}),
-    session?.user ? db.booking.findMany({
-      where: {
-        userId: (session.user as any).id,
-        date: {
-          gte: new Date(),
-        },
-      },
-      include: {
-        service: true,
-        establishment: true,
-      },
-    }) : Promise.resolve([])
-  ])
+    session?.user
+      ? db.booking.findMany({
+          where: {
+            userId: (session.user as any).id,
+            date: {
+              gte: new Date(),
+            },
+          },
+          include: {
+            service: true,
+            establishment: true,
+          },
+        })
+      : Promise.resolve([]),
+  ]);
 
   return (
     <div>
       <Header />
 
       <div className="px-5 pt-5">
-        <h2 className="text-xl font-bold">Óla, Miguel!</h2>
+        <h2 className="text-xl font-bold">
+          {session?.user
+            ? `Óla, ${session.user.name?.split(" ")[0]}!`
+            : "Óla, vamos agendar um serviço?"}
+        </h2>
         <p className="capitalize text-sm">
           {format(new Date(), "EEEE',' dd 'de' MMMM", {
             locale: ptBR,
@@ -47,17 +53,21 @@ export default async function Home() {
       </div>
 
       <div className="mt-6">
-        <h2 className="pl-3 text-xs uppercase text-gray-400 font-bold mb-3">
-          Agendamentos
-        </h2>
+        {confirmedBookings.length > 0 && (
+          <>
+            <h2 className="pl-3 text-xs uppercase text-gray-400 font-bold mb-3">
+              Agendamentos
+            </h2>
 
-        <div className="px-3 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          {confirmedBookings.map(
-            (booking: Booking, index: Key | null | undefined) => (
-              <BookingItem booking={booking} key={index} />
-            )
-          )}
-        </div>
+            <div className="px-3 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+              {confirmedBookings.map(
+                (booking: Booking, index: Key | null | undefined) => (
+                  <BookingItem booking={booking} key={index} />
+                )
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="mt-6">
