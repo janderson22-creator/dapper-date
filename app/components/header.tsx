@@ -4,12 +4,15 @@ import { Button } from "./ui/button";
 import { MenuIcon } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import SideMenu from "./side-menu";
+import Link from "next/link";
 
 const Header = () => {
   return (
     <Card className="rounded-none">
       <CardContent className="p-5 flex items-center justify-between">
+        <Link href={"/"} >
         <Image src="/logo.png" alt="dapper date" height={22} width={120} />
+        </Link>
 
         <Sheet>
           <SheetTrigger asChild>
