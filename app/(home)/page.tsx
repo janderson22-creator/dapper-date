@@ -8,7 +8,7 @@ import EstablishmentItem from "./components/establishment-item";
 import { Key } from "react";
 import { Booking, Establishment } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "../lib/auth";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
