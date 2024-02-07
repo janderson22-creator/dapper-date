@@ -1,11 +1,11 @@
-import { format, isFuture } from "date-fns";
+import { format } from "date-fns";
 import Header from "../components/header";
 import { ptBR } from "date-fns/locale";
 import Search from "./components/search";
 import BookingItem from "../components/booking-item";
 import { db } from "../lib/prisma";
 import EstablishmentItem from "./components/establishment-item";
-import { Key } from "react";
+import { Key, useState } from "react";
 import { Booking, Establishment } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
