@@ -20,13 +20,24 @@ model User {
   bookings      Booking[]
 }
 model Establishment {
-  id       String    @id @default(uuid())
-  name     String
-  address  String
-  imageUrl String
-  services  Service[]
-  bookings  Booking[]
+  id          String          @id @default(uuid())
+  name        String
+  address     String
+  imageUrl    String
+  services    Service[]
+  bookings    Booking[]
+  openingHours OpeningHour[]
 }
+
+model OpeningHour {
+  id              String      @id @default(uuid())
+  establishmentId String
+  establishment   Establishment @relation(fields: [establishmentId], references: [id])
+  dayOfWeek       String
+  startTime       String 
+  endTime         String
+}
+
 model Service {
   id              String        @id @default(uuid())
   name            String

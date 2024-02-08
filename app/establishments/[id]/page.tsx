@@ -27,6 +27,7 @@ const EstablishmentDetailsPage: React.FC<
     },
     include: {
       services: true,
+      openingHours: true,
     },
   });
 
