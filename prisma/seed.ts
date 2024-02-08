@@ -106,6 +106,48 @@ async function seedDatabase() {
           name,
           address,
           imageUrl: imageUrl,
+          openingHours: {
+            create: [
+              {
+                dayOfWeek: "segunda-feira",
+                startTime: "09:00",
+                endTime: "19:00",
+              },
+              {
+                dayOfWeek: "terca-feira",
+                startTime: "09:00",
+                endTime: "19:00",
+              },
+              {
+                dayOfWeek: "quarta-feira",
+                startTime: "09:00",
+                endTime: "19:00",
+              },
+              {
+                dayOfWeek: "quinta-feira",
+                startTime: "09:00",
+                endTime: "19:00",
+              },
+              {
+                dayOfWeek: "sexta-feira",
+                startTime: "09:00",
+                endTime: "19:00",
+              },
+              {
+                dayOfWeek: "sabado",
+                startTime: "09:00",
+                endTime: "19:00",
+              },
+              {
+                dayOfWeek: "domingo",
+                startTime: "",
+                endTime: "",
+              },
+            ],
+          },
+        },
+        include: {
+          openingHours: true,
         },
       });
 

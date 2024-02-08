@@ -1,6 +1,10 @@
 import { setHours, setMinutes, format, addMinutes, isToday } from "date-fns";
 
-export function generateDayTimeList(date: Date): string[] {
+export function generateDayTimeList(
+  date: Date,
+  startAt: number,
+  endAt: number
+): string[] {
   const today = new Date();
   const isCurrentDay = isToday(date);
 
@@ -14,7 +18,7 @@ export function generateDayTimeList(date: Date): string[] {
     // Calculating the next time slot
     if (currentMinute >= 45) {
       nextHour += 1;
-      nextMinute = 45; // Next slot starts at 30 minutes past the hour
+      nextMinute = 30; // Next slot starts at 30 minutes past the hour
     } else if (currentMinute >= 30) {
       nextHour += 1;
       nextMinute = 15;
@@ -26,10 +30,10 @@ export function generateDayTimeList(date: Date): string[] {
 
     startTime = setMinutes(setHours(today, nextHour), nextMinute);
   } else {
-    startTime = setMinutes(setHours(date, 9), 0);
+    startTime = setMinutes(setHours(date, startAt), 0); // Set end time to start time of establishment
   }
 
-  const endTime = setMinutes(setHours(date, 21), 0); // Set end time to 21:00
+  const endTime = setMinutes(setHours(date, endAt), 0); // Set end time to end time of establishment
   const interval = 45; // interval in minutes
   const timeList: string[] = [];
 

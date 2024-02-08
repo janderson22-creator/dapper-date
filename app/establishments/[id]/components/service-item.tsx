@@ -11,13 +11,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/app/components/ui/sheet";
-import { Booking, Establishment, Service } from "@prisma/client";
+import { Booking, Establishment, OpeningHour, Service } from "@prisma/client";
 import { ptBR } from "date-fns/locale";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { generateDayTimeList } from "../helpers/hours";
-import { addDays, format, isToday, setHours, setMinutes } from "date-fns";
+import { format, setHours, setMinutes } from "date-fns";
 import { saveBooking } from "../actions/save-booking";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -43,6 +43,44 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [dayBookings, setDayBookings] = useState<Booking>([]);
 
+  const getDayOfWeek = (date: Date): string => {
+    const daysOfWeek = [
+      "domingo",
+      "segunda-feira",
+      "terca-feira",
+      "quarta-feira",
+      "quinta-feira",
+      "sexta-feira",
+      "sabado",
+    ];
+    const dayIndex = date.getDay();
+    return daysOfWeek[dayIndex];
+  };
+
+  const getOpeningHourByDay = useMemo(() => {
+    if (!date) return undefined;
+
+    const selectedDayOfWeek = getDayOfWeek(date);
+
+    const openingHoursForSelectedDay = establishment.openingHours.find(
+      (openingHour: OpeningHour) => openingHour.dayOfWeek === selectedDayOfWeek
+    );
+
+    return openingHoursForSelectedDay.startTime
+      ? openingHoursForSelectedDay
+      : undefined;
+  }, [date, establishment.openingHours]);
+
+  useEffect(() => {
+    if (!date || getOpeningHourByDay) return;
+    const selectedDayOfWeek = getDayOfWeek(date);
+
+    toast.error(
+      `O estabelecimento ${establishment.name} não funciona ${selectedDayOfWeek}`
+    );
+  }, [date, establishment, establishment.name, getOpeningHourByDay]);
+
+  // get available hours of date selected
   useEffect(() => {
     if (!date) return;
 
@@ -53,7 +91,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     };
 
     refreshAvailableHours();
-  }, [date, establishment.id]);
+  }, [date, establishment.id, getOpeningHourByDay]);
 
   const dateClick = (date: Date | undefined) => {
     setDate(date);
@@ -104,9 +142,20 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   }, [data?.user, date, establishment.id, hour, router, service.id]);
 
   const timeList = useMemo(() => {
-    if (!date) return [];
+    if (!date || !getOpeningHourByDay) return [];
 
-    return generateDayTimeList(date).filter((time) => {
+    const startTimeFormatted = parseInt(
+      getOpeningHourByDay.startTime.split(":")[0]
+    );
+    const endTimeFormatted = parseInt(
+      getOpeningHourByDay.endTime.split(":")[0]
+    );
+
+    return generateDayTimeList(
+      date,
+      startTimeFormatted,
+      endTimeFormatted
+    ).filter((time) => {
       const timeHour = Number(time.split(":")[0]);
       const timeMinutes = Number(time.split(":")[1]);
 
@@ -123,7 +172,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
 
       return false;
     });
-  }, [date, dayBookings]);
+  }, [date, dayBookings, getOpeningHourByDay]);
 
   return (
     <Card>
@@ -197,7 +246,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                   />
                 </div>
 
-                {date && (
+                {getOpeningHourByDay && (
                   <div className="flex gap-3 py-6 px-5 border-t border-secondary overflow-x-auto [&::-webkit-scrollbar]:hidden">
                     {timeList.map((time, index) => (
                       <Button
