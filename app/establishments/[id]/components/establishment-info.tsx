@@ -1,64 +1,63 @@
 "use client";
-import SideMenu from "@/app/components/side-menu";
-import { Button } from "@/app/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/app/components/ui/sheet";
-import { Establishment } from "@prisma/client";
-import { ChevronLeftIcon, MapPinIcon, MenuIcon, StarIcon } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 
-interface EstablishmentInfoProps {
+import { Button } from "@/app/components/ui/button";
+import { Establishment, OpeningHour } from "@prisma/client";
+import { Smartphone } from "lucide-react";
+import { Key, useState } from "react";
+import { toast } from "sonner";
+
+interface Props {
   establishment: Establishment;
 }
 
-const EstablishmentInfo: React.FC<Establishment> = ({ establishment }) => {
-  const router = useRouter();
+const EstablishmentInfo: React.FC<Props> = ({ establishment }) => {
+
+  const copyPhoneNumber = () => {
+    navigator.clipboard.writeText(establishment.phoneNumber);
+    
+    toast.success("Copiado!", {
+      duration: 6000,
+      position: "top-center",
+      description: "Cole onde desejar.",
+    });
+  };
+
   return (
     <div>
-      <div className="h-[250px] w-full relative">
-        <Button
-          onClick={() => router.replace("/")}
-          size="icon"
-          variant="outline"
-          className="absolute z-50 top-4 left-4"
-        >
-          <ChevronLeftIcon />
+      <p className="text-gray-400 font-bold uppercase">sobre nós</p>
+
+      <p className="text-sm mt-3">{establishment.description}</p>
+
+      <div className="flex items-center justify-between border-y border-secondary py-2 my-6">
+        <div className="flex items-center gap-2.5">
+          <Smartphone />
+          <p className="text-sm">{establishment.phoneNumber}</p>
+        </div>
+
+        <Button variant="secondary" onClick={copyPhoneNumber}>
+          Copiar
         </Button>
-
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button
-              size="icon"
-              variant="outline"
-              className="absolute z-50 top-4 right-4"
-            >
-              <MenuIcon />
-            </Button>
-          </SheetTrigger>
-
-          <SheetContent className="p-0">
-            <SideMenu />
-          </SheetContent>
-        </Sheet>
-
-        <Image
-          src={establishment.imageUrl}
-          fill
-          alt={establishment.name}
-          className="object-cover opacity-75"
-        />
       </div>
 
-      <div className="px-5 pt-3 pb-6 border-b border-secondary">
-        <h1 className="text-xl font-bold">{establishment.name}</h1>
-        <div className="flex items-center gap-2 mt-2">
-          <MapPinIcon className="text-primary" size={18} />
-          <p className="text-sm">{establishment.address}</p>
-        </div>
-        <div className="flex items-center gap-2 mt-2">
-          <StarIcon className="text-primary fill-primary" size={18} />
-          <p className="text-sm">5,0 (899 avaliações)</p>
-        </div>
+      <div className="pb-12">
+        {establishment.openingHours.map(
+          (item: OpeningHour, key: Key | null | undefined) => (
+            <div
+              className="text-sm flex items-center justify-between mb-2.5 last-of-type:mb-0"
+              key={key}
+            >
+              <p className="text-gray-400">{item.dayOfWeek}</p>
+
+              <div className="flex">
+                <p>
+                  {item.startTime
+                    ? `${item.startTime} - ${item.endTime}`
+                    : "Fechado"}
+                </p>
+              </div>
+            </div>
+          )
+        )}
       </div>
     </div>
   );

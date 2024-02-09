@@ -27,6 +27,7 @@ async function seedDatabase() {
       "https://utfs.io/f/07842cfb-7b30-4fdc-accc-719618dfa1f2-17s.png",
       "https://utfs.io/f/0522fdaf-0357-4213-8f52-1d83c3dcb6cd-18e.png",
     ];
+
     // Nomes criativos para os estabelecimentos
     const creativeNames = [
       "Barbearia Vintage",
@@ -94,7 +95,13 @@ async function seedDatabase() {
       },
     ];
 
-    // Criar 10 barbearias com nomes e endereços fictícios
+    // Descrição para todos os estabelecimentos
+    const description = "Bem-vindo à Vintage Barber, onde tradição encontra estilo. Nossa equipe de mestres barbeiros transforma cortes de cabelo e barbas em obras de arte. Em um ambiente acolhedor, promovemos confiança, estilo e uma comunidade unida.";
+
+    // Número de telefone para todos os estabelecimentos
+    const phoneNumber = "(11) 98204-5108";
+
+    // Criar 10 barbearias com nomes, endereços, descrições e números de telefone fictícios
     const establishments = [];
     for (let i = 0; i < 10; i++) {
       const name = creativeNames[i];
@@ -106,6 +113,8 @@ async function seedDatabase() {
           name,
           address,
           imageUrl: imageUrl,
+          description: description,
+          phoneNumber: phoneNumber,
           openingHours: {
             create: [
               {
