@@ -36,7 +36,7 @@ const EstablishmentItem: React.FC<EstablishmentProps> = ({ establishment }) => {
           <h2 className="font-bold mt-2 overflow-hidden text-ellipsis text-nowrap">
             {establishment.name}
           </h2>
-          <p className="text-sm text-gray-400 overflow-hidden text-ellipsis text-nowrap">
+          <p className="text-sm text-gray-400 overflow-hidden text-ellipsis text-nowrap max-w-full">
             {establishment.address}
           </p>
           <Link href={`/establishments/${establishment.id}`}>
