@@ -41,6 +41,13 @@ const BookingsPage = async () => {
     }),
   ]);
 
+  confirmedBookings.sort(
+    (
+      a: { date: string | number | Date },
+      b: { date: string | number | Date }
+    ) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
   return (
     <div>
       <Header />

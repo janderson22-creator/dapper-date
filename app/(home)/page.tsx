@@ -5,7 +5,7 @@ import Search from "./components/search";
 import BookingItem from "../components/booking-item";
 import { db } from "../lib/prisma";
 import EstablishmentItem from "./components/establishment-item";
-import { Key, useState } from "react";
+import { Key } from "react";
 import { Booking, Establishment } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
@@ -30,6 +30,13 @@ export default async function Home() {
         })
       : Promise.resolve([]),
   ]);
+
+  confirmedBookings.sort(
+    (
+      a: { date: string | number | Date },
+      b: { date: string | number | Date }
+    ) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
 
   return (
     <div>
