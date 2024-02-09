@@ -1,31 +1,40 @@
+"use client";
+
 import { Button } from "@/app/components/ui/button";
 import { Establishment, OpeningHour } from "@prisma/client";
 import { Smartphone } from "lucide-react";
-import { Key } from "react";
+import { Key, useState } from "react";
+import { toast } from "sonner";
 
 interface Props {
   establishment: Establishment;
 }
 
 const EstablishmentInfo: React.FC<Props> = ({ establishment }) => {
+
+  const copyPhoneNumber = () => {
+    navigator.clipboard.writeText(establishment.phoneNumber);
+    
+    toast.success("Copiado!", {
+      duration: 6000,
+      position: "top-center",
+      description: "Cole onde desejar.",
+    });
+  };
+
   return (
     <div>
       <p className="text-gray-400 font-bold uppercase">sobre nós</p>
 
-      <p className="text-sm mt-3">
-        Bem-vindo à Vintage Barber, onde tradição encontra estilo. Nossa equipe
-        de mestres barbeiros transforma cortes de cabelo e barbas em obras de
-        arte. Em um ambiente acolhedor, promovemos confiança, estilo e uma
-        comunidade unida.
-      </p>
+      <p className="text-sm mt-3">{establishment.description}</p>
 
       <div className="flex items-center justify-between border-y border-secondary py-2 my-6">
         <div className="flex items-center gap-2.5">
           <Smartphone />
-          <p className="text-sm">(11) 98204-5108</p>
+          <p className="text-sm">{establishment.phoneNumber}</p>
         </div>
 
-        <Button variant="secondary">
+        <Button variant="secondary" onClick={copyPhoneNumber}>
           Copiar
         </Button>
       </div>

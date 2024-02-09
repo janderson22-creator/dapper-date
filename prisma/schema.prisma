@@ -24,6 +24,8 @@ model Establishment {
   name        String
   address     String
   imageUrl    String
+  description String
+  phoneNumber String
   services    Service[]
   bookings    Booking[]
   openingHours OpeningHour[]
