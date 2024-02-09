@@ -20,12 +20,11 @@ export function generateDayTimeList(
       nextHour += 1;
       nextMinute = 30; // Next slot starts at 30 minutes past the hour
     } else if (currentMinute >= 30) {
-      nextHour += 1;
-      nextMinute = 15;
+      nextMinute = 45;
     } else if (currentMinute >= 15) {
-      nextMinute = 30;
+      nextMinute = 45;
     } else {
-      nextMinute = 15;
+      nextMinute = 45;
     }
 
     startTime = setMinutes(setHours(today, nextHour), nextMinute);

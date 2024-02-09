@@ -125,7 +125,9 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
       setSheetIsOpen(false);
       setHour(undefined);
       setDate(undefined);
-      toast("Reserva realizada com sucesso!", {
+      toast.success("Reserva realizada com sucesso!", {
+        duration: 6000,
+        position: "top-center",
         description: format(newDate, "'Para' dd 'de' MMMM 'ás' HH':'mm'.'", {
           locale: ptBR,
         }),
@@ -205,20 +207,19 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
               </SheetTrigger>
 
               <SheetContent className="p-0 w-10/12">
-                <SheetHeader className="text-left px-5 py-2.5 border-b border-secondary">
+                <SheetHeader className="text-left px-5 py-2 border-b border-secondary">
                   <SheetTitle>Fazer Reserva</SheetTitle>
                 </SheetHeader>
 
                 {/* React Day Picker Below */}
 
-                <div className="py-6">
+                <div className="py-2">
                   <Calendar
-                    className="w-full"
+                    className="w-full h-[50%]"
                     mode="single"
                     selected={date}
                     onSelect={dateClick}
                     locale={ptBR}
-                    // fromDate={addDays(new Date(), 1)}
                     fromDate={new Date()}
                     styles={{
                       head_cell: {
@@ -247,7 +248,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                 </div>
 
                 {getOpeningHourByDay && (
-                  <div className="flex gap-3 py-6 px-5 border-t border-secondary overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                  <div className="flex gap-3 py-4 px-5 border-t border-secondary overflow-x-auto [&::-webkit-scrollbar]:hidden">
                     {timeList.map((time, index) => (
                       <Button
                         onClick={() => setHour(time)}
@@ -261,7 +262,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                   </div>
                 )}
 
-                <div className="py-6 px-5 border-t border-secondary">
+                <div className="py-4 px-5 border-t border-secondary">
                   <Card>
                     <CardContent className="p-3 flex flex-col gap-3">
                       <div className="flex items-center justify-between">
@@ -299,17 +300,16 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                     </CardContent>
                   </Card>
                 </div>
-                <SheetFooter className="px-5">
-                  <Button
-                    onClick={bookingSubmit}
-                    disabled={!date || !hour || submitIsLoading}
-                  >
-                    {submitIsLoading && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Confirmar reserva
-                  </Button>
-                </SheetFooter>
+                <Button
+                  className="absolute bottom-5 left-0 right-0 w-[87%] mx-auto"
+                  onClick={bookingSubmit}
+                  disabled={!date || !hour || submitIsLoading}
+                >
+                  {submitIsLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Confirmar reserva
+                </Button>
               </SheetContent>
             </Sheet>
           </div>
