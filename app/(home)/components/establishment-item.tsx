@@ -12,7 +12,7 @@ interface EstablishmentProps {
 
 const EstablishmentItem: React.FC<EstablishmentProps> = ({ establishment }) => {
   return (
-    <Card className="min-w-[167px] max-w-[167px] rounded-2xl">
+    <Card className="min-w-[167px] max-w-[167px] max-h-[291px] rounded-2xl">
       <CardContent className="p-0">
         <div className="p-1 relative">
           <Badge
@@ -33,10 +33,10 @@ const EstablishmentItem: React.FC<EstablishmentProps> = ({ establishment }) => {
         </div>
 
         <div className="p-3 pt-0">
-          <h2 className="font-bold mt-2 overflow-hidden text-ellipsis text-nowrap">
+          <h2 className="font-bold mt-2 overflow-hidden text-ellipsis text-nowrap whitespace-nowrap max-w-full">
             {establishment.name}
           </h2>
-          <p className="text-sm text-gray-400 overflow-hidden text-ellipsis text-nowrap max-w-full">
+          <p className="text-sm text-gray-400 overflow-hidden text-ellipsis text-nowrap whitespace-nowrap max-w-full">
             {establishment.address}
           </p>
           <Link href={`/establishments/${establishment.id}`}>

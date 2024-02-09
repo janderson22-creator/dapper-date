@@ -1,10 +1,11 @@
 import { db } from "@/app/lib/prisma";
-import EstablishmentInfo from "./components/establishment-info";
 import ServiceItem from "./components/service-item";
 import { Key } from "react";
 import { Establishment, Service } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
+import EstablishmentHeader from "./components/establishment-header";
+import Services from "./components/services";
 
 interface EstablishmentDetailsPageProps {
   params: {
@@ -31,26 +32,16 @@ const EstablishmentDetailsPage: React.FC<
     },
   });
 
-
   if (!establishment) {
     return null;
   }
 
   return (
     <div>
-      <EstablishmentInfo establishment={establishment} />
+      <EstablishmentHeader establishment={establishment} />
 
-      <div className="flex flex-col gap-3 px-5 pt-6">
-        {establishment.services?.map(
-          (service: Service, index: Key | null | undefined) => (
-            <ServiceItem
-              key={index}
-              service={service}
-              establishment={establishment}
-              isAuthenticated={!!session?.user}
-            />
-          )
-        )}
+      <div className="pt-5">
+        <Services establishment={establishment} user={!!session?.user} />
       </div>
     </div>
   );
