@@ -29,7 +29,7 @@ model Establishment {
   services    Service[]
   bookings    Booking[]
   openingHours OpeningHour[]
-  Employees Employee[]
+  employees Employee[]
 }
 model Employee {
   id   String   @id @default(uuid())

@@ -11,11 +11,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/app/components/ui/sheet";
-import { Booking, Establishment, OpeningHour, Service } from "@prisma/client";
+import {
+  Booking,
+  Employee,
+  Establishment,
+  OpeningHour,
+  Service,
+} from "@prisma/client";
 import { ptBR } from "date-fns/locale";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Key, useCallback, useEffect, useMemo, useState } from "react";
 import { generateDayTimeList } from "../helpers/hours";
 import { format, setHours, setMinutes } from "date-fns";
 import { saveBooking } from "../actions/save-booking";
@@ -23,6 +29,8 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { getDayBookings } from "../actions/get-day-bookings";
+import EmployeeItem from "./employee-item";
+import { cn } from "@/app/lib/utils";
 
 interface ServiceItemProps {
   establishment: Establishment;
@@ -39,6 +47,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   const { data } = useSession();
   const [date, setDate] = useState<Date | undefined>();
   const [hour, setHour] = useState<string | undefined>();
+  const [employeeId, setEmployeeId] = useState<string | undefined>();
   const [submitIsLoading, setSubmitIsLoading] = useState(false);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [dayBookings, setDayBookings] = useState<Booking>([]);
@@ -82,20 +91,21 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
 
   // get available hours of date selected
   useEffect(() => {
-    if (!date) return;
-
+    if (!date || !employeeId) return;
+    // TODO: GET DAY BOOKINGS BY EMPLOYEE ID
     const refreshAvailableHours = async () => {
-      const bookingsDay = await getDayBookings(date, establishment.id);
+      const bookingsDay = await getDayBookings(date, establishment.id, employeeId);
 
       setDayBookings(bookingsDay);
     };
 
     refreshAvailableHours();
-  }, [date, establishment.id, getOpeningHourByDay]);
+  }, [date, employeeId, establishment.id, getOpeningHourByDay]);
 
   const dateClick = (date: Date | undefined) => {
     setDate(date);
     setHour(undefined);
+    setEmployeeId(undefined);
   };
 
   const bookingClick = () => {
@@ -107,7 +117,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   const bookingSubmit = useCallback(async () => {
     setSubmitIsLoading(true);
     try {
-      if (!hour || !date || !data?.user) {
+      if (!hour || !date || !employeeId || !data?.user) {
         return;
       }
       const dateHour = Number(hour.split(":")[0]);
@@ -116,10 +126,11 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
       const newDate = setMinutes(setHours(date, dateHour), dateMinutes);
 
       await saveBooking({
+        employeeId: employeeId,
+        userId: (data.user as any).id,
         serviceId: service.id,
         establishmentId: establishment.id,
         date: newDate,
-        userId: (data.user as any).id,
       });
 
       setSheetIsOpen(false);
@@ -141,7 +152,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     } finally {
       setSubmitIsLoading(false);
     }
-  }, [data?.user, date, establishment.id, hour, router, service.id]);
+  }, [data?.user, date, employeeId, establishment.id, hour, router, service.id]);
 
   const timeList = useMemo(() => {
     if (!date || !getOpeningHourByDay) return [];
@@ -248,6 +259,27 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                 </div>
 
                 {getOpeningHourByDay && (
+                  <div
+                    className={cn(
+                      "flex gap-3 py-4 px-5 border-t border-secondary overflow-x-auto [&::-webkit-scrollbar]:hidden",
+                      establishment.employees.length <= 2 &&
+                        "items-center justify-center"
+                    )}
+                  >
+                    {establishment.employees.map(
+                      (employee: Employee, index: Key | null | undefined) => (
+                        <EmployeeItem
+                          employeeId={employeeId}
+                          setEmployee={setEmployeeId}
+                          employee={employee}
+                          key={index}
+                        />
+                      )
+                    )}
+                  </div>
+                )}
+
+                {employeeId && (
                   <div className="flex gap-3 py-4 px-5 border-t border-secondary overflow-x-auto [&::-webkit-scrollbar]:hidden">
                     {timeList.map((time, index) => (
                       <Button

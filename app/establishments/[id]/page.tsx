@@ -29,6 +29,7 @@ const EstablishmentDetailsPage: React.FC<
     include: {
       services: true,
       openingHours: true,
+      employees: true
     },
   });
 
@@ -41,7 +42,7 @@ const EstablishmentDetailsPage: React.FC<
       <EstablishmentHeader establishment={establishment} />
 
       <div className="pt-5">
-        <Services establishment={establishment} user={!!session?.user} />
+        <Services establishment={establishment} HasUser={!!session?.user} />
       </div>
     </div>
   );
