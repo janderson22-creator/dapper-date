@@ -5,29 +5,30 @@ import {
 } from "@/app/components/ui/avatar";
 import { cn } from "@/app/lib/utils";
 import { Employee } from "@prisma/client";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch } from "react";
 
 interface EmployeeItemProps {
   employee: Employee;
-  employeeId: string | undefined;
-  setEmployee: Dispatch<SetStateAction<string | undefined>>;
+  employeeSelected: Employee | undefined;
+  setEmployeeSelected: Dispatch<any>;
 }
 
 const EmployeeItem: React.FC<EmployeeItemProps> = ({
   employee,
-  employeeId,
-  setEmployee,
+  employeeSelected,
+  setEmployeeSelected,
 }) => {
   return (
     <div
-      onClick={() => setEmployee(employee.id)}
+      onClick={() => setEmployeeSelected(employee)}
       className="flex flex-col items-center"
     >
       <div className="flex items-center justify-center min-w-24 min-h-24">
         <Avatar
           className={cn(
             "h-20 w-20 transition-all ease-in-out duration-200",
-            employee.id === employeeId &&
+            employeeSelected &&
+              employee.id === employeeSelected.id &&
               "border-[3px] border-primary w-[88px] h-[88px]"
           )}
         >

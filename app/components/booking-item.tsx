@@ -80,7 +80,10 @@ const BookingItem: React.FC<BookingItemProps> = ({ booking }) => {
                   <AvatarFallback>A</AvatarFallback>
                 </Avatar>
 
-                <h3 className="text-sm">{booking.establishment.name}</h3>
+                <div className="flex flex-col items-center">
+                  <h3 className="text-sm font-semibold opacity-90">{booking.establishment.name}</h3>
+                  <p className="text-xs text-gray-400">{booking.employee?.name}</p>
+                </div>
               </div>
             </div>
 
@@ -96,7 +99,7 @@ const BookingItem: React.FC<BookingItemProps> = ({ booking }) => {
                 })}
               </p>
               <p className="text-sm">
-                {format(booking.date, "hh:mm", {
+                {format(booking.date, "HH:mm", {
                   locale: ptBR,
                 })}
               </p>
@@ -180,6 +183,11 @@ const BookingItem: React.FC<BookingItemProps> = ({ booking }) => {
               <div className="flex justify-between text-sm">
                 <h3 className="text-gray-400">Estabelecimento</h3>
                 <h4 className="text-gray-400">{booking.establishment.name}</h4>
+              </div>
+
+              <div className="flex justify-between text-sm">
+                <h3 className="text-gray-400">Profissional</h3>
+                <h4 className="text-gray-400">{booking.employee.name}</h4>
               </div>
             </CardContent>
           </Card>

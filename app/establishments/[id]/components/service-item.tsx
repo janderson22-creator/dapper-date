@@ -5,6 +5,7 @@ import { Calendar } from "@/app/components/ui/calendar";
 import { Card, CardContent } from "@/app/components/ui/card";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
@@ -47,7 +48,9 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   const { data } = useSession();
   const [date, setDate] = useState<Date | undefined>();
   const [hour, setHour] = useState<string | undefined>();
-  const [employeeId, setEmployeeId] = useState<string | undefined>();
+  const [employeeSelected, setEmployeeSelected] = useState<
+    Employee | undefined
+  >();
   const [submitIsLoading, setSubmitIsLoading] = useState(false);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [dayBookings, setDayBookings] = useState<Booking>([]);
@@ -91,21 +94,25 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
 
   // get available hours of date selected
   useEffect(() => {
-    if (!date || !employeeId) return;
+    if (!date || !employeeSelected) return;
     // TODO: GET DAY BOOKINGS BY EMPLOYEE ID
     const refreshAvailableHours = async () => {
-      const bookingsDay = await getDayBookings(date, establishment.id, employeeId);
+      const bookingsDay = await getDayBookings(
+        date,
+        establishment.id,
+        employeeSelected.id
+      );
 
       setDayBookings(bookingsDay);
     };
 
     refreshAvailableHours();
-  }, [date, employeeId, establishment.id, getOpeningHourByDay]);
+  }, [date, employeeSelected, establishment.id, getOpeningHourByDay]);
 
   const dateClick = (date: Date | undefined) => {
     setDate(date);
     setHour(undefined);
-    setEmployeeId(undefined);
+    setEmployeeSelected(undefined);
   };
 
   const bookingClick = () => {
@@ -117,7 +124,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   const bookingSubmit = useCallback(async () => {
     setSubmitIsLoading(true);
     try {
-      if (!hour || !date || !employeeId || !data?.user) {
+      if (!hour || !date || !employeeSelected || !data?.user) {
         return;
       }
       const dateHour = Number(hour.split(":")[0]);
@@ -126,7 +133,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
       const newDate = setMinutes(setHours(date, dateHour), dateMinutes);
 
       await saveBooking({
-        employeeId: employeeId,
+        employeeId: employeeSelected.id,
         userId: (data.user as any).id,
         serviceId: service.id,
         establishmentId: establishment.id,
@@ -152,7 +159,15 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     } finally {
       setSubmitIsLoading(false);
     }
-  }, [data?.user, date, employeeId, establishment.id, hour, router, service.id]);
+  }, [
+    data?.user,
+    date,
+    employeeSelected,
+    establishment.id,
+    hour,
+    router,
+    service.id,
+  ]);
 
   const timeList = useMemo(() => {
     if (!date || !getOpeningHourByDay) return [];
@@ -269,8 +284,8 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                     {establishment.employees.map(
                       (employee: Employee, index: Key | null | undefined) => (
                         <EmployeeItem
-                          employeeId={employeeId}
-                          setEmployee={setEmployeeId}
+                          employeeSelected={employeeSelected}
+                          setEmployeeSelected={setEmployeeSelected}
                           employee={employee}
                           key={index}
                         />
@@ -279,7 +294,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                   </div>
                 )}
 
-                {employeeId && (
+                {employeeSelected && (
                   <div className="flex gap-3 py-4 px-5 border-t border-secondary overflow-x-auto [&::-webkit-scrollbar]:hidden">
                     {timeList.map((time, index) => (
                       <Button
@@ -294,54 +309,84 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                   </div>
                 )}
 
-                {/* <div className="py-4 px-5 border-t border-secondary">
-                  <Card>
-                    <CardContent className="p-3 flex flex-col gap-3">
-                      <div className="flex items-center justify-between">
-                        <h2 className="font-bold">{service.name}</h2>
-                        <h3 className="font-bold text-sm">
-                          {Intl.NumberFormat("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          }).format(Number(service.price))}
-                        </h3>
-                      </div>
-
-                      {date && (
-                        <div className="flex justify-between text-sm">
-                          <h3 className="text-gray-400">Data</h3>
-                          <h4 className="text-gray-400">
-                            {format(date, "dd 'de' MMMM", {
-                              locale: ptBR,
-                            })}
-                          </h4>
-                        </div>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button
+                      className="absolute bottom-5 left-0 right-0 w-[87%] mx-auto"
+                      disabled={!date || !hour || submitIsLoading}
+                    >
+                      {submitIsLoading && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
+                      Confirmar
+                    </Button>
+                  </SheetTrigger>
 
-                      {hour && (
-                        <div className="flex justify-between text-sm">
-                          <h3 className="text-gray-400">Horário</h3>
-                          <h4 className="text-gray-400">{hour}</h4>
-                        </div>
-                      )}
+                  <SheetContent side="bottom">
+                    <div className="py-4 mt-2">
+                      <Card>
+                        <CardContent className="p-3 flex flex-col gap-3">
+                          <div className="flex items-center justify-between">
+                            <h2 className="font-bold">{service.name}</h2>
+                            <h3 className="font-bold text-sm">
+                              {Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                              }).format(Number(service.price))}
+                            </h3>
+                          </div>
 
-                      <div className="flex justify-between text-sm">
-                        <h3 className="text-gray-400">Estabelecimento</h3>
-                        <h4 className="text-gray-400">{establishment.name}</h4>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div> */}
-                <Button
-                  className="absolute bottom-5 left-0 right-0 w-[87%] mx-auto"
-                  onClick={bookingSubmit}
-                  disabled={!date || !hour || submitIsLoading}
-                >
-                  {submitIsLoading && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Confirmar reserva
-                </Button>
+                          {date && (
+                            <div className="flex justify-between text-sm">
+                              <h3 className="text-gray-400">Data</h3>
+                              <h4 className="text-gray-400">
+                                {format(date, "dd 'de' MMMM", {
+                                  locale: ptBR,
+                                })}
+                              </h4>
+                            </div>
+                          )}
+
+                          {hour && (
+                            <div className="flex justify-between text-sm">
+                              <h3 className="text-gray-400">Horário</h3>
+                              <h4 className="text-gray-400">{hour}</h4>
+                            </div>
+                          )}
+
+                          <div className="flex justify-between text-sm">
+                            <h3 className="text-gray-400">Estabelecimento</h3>
+                            <h4 className="text-gray-400">
+                              {establishment.name}
+                            </h4>
+                          </div>
+                          
+                          {employeeSelected && (
+                            <div className="flex justify-between text-sm">
+                              <h3 className="text-gray-400">Profissional</h3>
+                              <h4 className="text-gray-400">
+                                {employeeSelected.name}
+                              </h4>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    <SheetClose asChild>
+                      <Button
+                        className="w-full"
+                        onClick={bookingSubmit}
+                        disabled={!date || !hour || submitIsLoading}
+                      >
+                        {submitIsLoading && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Confirmar reserva
+                      </Button>
+                    </SheetClose>
+                  </SheetContent>
+                </Sheet>
               </SheetContent>
             </Sheet>
           </div>

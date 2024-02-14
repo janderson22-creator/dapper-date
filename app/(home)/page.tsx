@@ -26,6 +26,7 @@ export default async function Home() {
           include: {
             service: true,
             establishment: true,
+            employee: true,
           },
         })
       : Promise.resolve([]),
