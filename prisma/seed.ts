@@ -176,6 +176,22 @@ async function seedDatabase() {
         });
       }
 
+      // Adicionar dois funcionários para cada estabelecimento
+      for (let j = 0; j < 2; j++) {
+        await prisma.employee.create({
+          data: {
+            name: `Funcionário ${j + 1}`,
+            imageUrl: images[i * 2 + j], // Seleciona imagens aleatórias para os funcionários
+            position: "Barbeiro",
+            establishment: {
+              connect: {
+                id: establishment.id,
+              },
+            },
+          },
+        });
+      }
+
       establishments.push(establishment);
     }
 
