@@ -25,6 +25,7 @@ const BookingsPage = async () => {
       include: {
         service: true,
         establishment: true,
+        employee: true,
       },
     }),
     db.booking.findMany({
@@ -37,6 +38,7 @@ const BookingsPage = async () => {
       include: {
         service: true,
         establishment: true,
+        employee: true,
       },
     }),
   ]);
