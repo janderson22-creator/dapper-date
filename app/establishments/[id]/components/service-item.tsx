@@ -294,7 +294,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                   </div>
                 )}
 
-                <div className="py-4 px-5 border-t border-secondary">
+                {/* <div className="py-4 px-5 border-t border-secondary">
                   <Card>
                     <CardContent className="p-3 flex flex-col gap-3">
                       <div className="flex items-center justify-between">
@@ -331,7 +331,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                       </div>
                     </CardContent>
                   </Card>
-                </div>
+                </div> */}
                 <Button
                   className="absolute bottom-5 left-0 right-0 w-[87%] mx-auto"
                   onClick={bookingSubmit}
