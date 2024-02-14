@@ -8,10 +8,10 @@ import EstablishmentInfo from "./establishment-info";
 
 interface Props {
   establishment: Establishment;
-  user: boolean;
+  HasUser: boolean;
 }
 
-const Services: React.FC<Props> = ({ establishment, user }) => {
+const Services: React.FC<Props> = ({ establishment, HasUser }) => {
   const [optionSelected, setOptionSelected] = useState<Options>("serviços");
 
   return (
@@ -37,7 +37,7 @@ const Services: React.FC<Props> = ({ establishment, user }) => {
                 key={index}
                 service={service}
                 establishment={establishment}
-                isAuthenticated={user}
+                isAuthenticated={HasUser}
               />
             )
           )}

@@ -7,16 +7,18 @@ interface SaveBookingParams {
   establishmentId: string;
   serviceId: string;
   userId: string;
+  employeeId: string;
   date: Date;
 }
 
 export const saveBooking = async (params: SaveBookingParams) => {
   await db.booking.create({
     data: {
-      serviceId: params.serviceId,
       userId: params.userId,
-      date: params.date,
+      employeeId: params.employeeId,
+      serviceId: params.serviceId,
       establishmentId: params.establishmentId,
+      date: params.date,
     },
   });
 

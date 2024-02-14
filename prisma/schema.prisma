@@ -29,8 +29,18 @@ model Establishment {
   services    Service[]
   bookings    Booking[]
   openingHours OpeningHour[]
+  employees Employee[]
 }
+model Employee {
+  id   String   @id @default(uuid())
+  imageUrl    String
+  name        String
+  position    String
 
+  establishmentId String
+  establishment   Establishment @relation(fields: [establishmentId], references: [id])
+  bookings    Booking[]
+}
 model OpeningHour {
   id              String      @id @default(uuid())
   establishmentId String
@@ -62,6 +72,9 @@ model Booking {
 
   establishmentId String
   establishment   Establishment @relation(fields: [establishmentId], references: [id])
+
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
 }
 model Account {
   id                String  @id @default(cuid())
