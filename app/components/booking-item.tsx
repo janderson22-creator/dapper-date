@@ -81,8 +81,12 @@ const BookingItem: React.FC<BookingItemProps> = ({ booking }) => {
                 </Avatar>
 
                 <div className="flex flex-col items-center">
-                  <h3 className="text-sm font-semibold opacity-90">{booking.establishment.name}</h3>
-                  <p className="text-xs text-gray-400">{booking.employee?.name}</p>
+                  <h3 className="text-sm font-semibold opacity-90">
+                    {booking.establishment.name}
+                  </h3>
+                  <p className="text-xs text-gray-400">
+                    {booking.employee?.name}
+                  </p>
                 </div>
               </div>
             </div>
@@ -114,7 +118,7 @@ const BookingItem: React.FC<BookingItemProps> = ({ booking }) => {
         </SheetHeader>
 
         <div className="relative mt-6 px-3 rounded-lg">
-          {/* TODO: adicionar mapa com a localização do estabelecimento */}
+          {/* TODO: add map with establishment location */}
           <Image
             width={0}
             height={0}
@@ -221,16 +225,18 @@ const BookingItem: React.FC<BookingItemProps> = ({ booking }) => {
                     Voltar
                   </AlertDialogCancel>
 
-                  <AlertDialogAction
-                    disabled={isPast(booking.date) || isDeleteLoading}
-                    className="w-full"
-                    onClick={cancelClick}
-                  >
-                    {isDeleteLoading && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Confirmar
-                  </AlertDialogAction>
+                  <SheetClose asChild>
+                    <AlertDialogAction
+                      disabled={isPast(booking.date) || isDeleteLoading}
+                      className="w-full"
+                      onClick={cancelClick}
+                    >
+                      {isDeleteLoading && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Confirmar
+                    </AlertDialogAction>
+                  </SheetClose>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
