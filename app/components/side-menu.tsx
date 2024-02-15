@@ -1,17 +1,24 @@
 "use client";
 
 import { signIn, signOut, useSession } from "next-auth/react";
-import { SheetHeader, SheetTitle } from "./ui/sheet";
+import {
+  Sheet,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
   CalendarIcon,
+  GanttChartSquare,
   HomeIcon,
   LogInIcon,
   LogOutIcon,
   UserIcon,
 } from "lucide-react";
 import Link from "next/link";
+import LoginForm from "./login-admin";
 
 const SideMenu = () => {
   const { data } = useSession();
@@ -41,14 +48,14 @@ const SideMenu = () => {
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col px-5 py-6 gap-3">
+        <div className="flex flex-col px-5 pt-6 gap-3">
           <div className="flex items-center gap-2">
-            <UserIcon size={32} />
+            <UserIcon size={25} />
             <h2 className="font-bold">Olá, faça seu login!</h2>
           </div>
           <Button
             variant="secondary"
-            className="w-full justify-start"
+            className="w-full justify-start mb-8 mt-2"
             onClick={loginClick}
           >
             <LogInIcon className="mr-2" size={18} />
@@ -72,6 +79,19 @@ const SideMenu = () => {
               Agendamentos
             </Link>
           </Button>
+        )}
+
+        {!data?.user && (
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="justify-start">
+                <GanttChartSquare size={18} className="mr-2" />
+                Adiministrador
+              </Button>
+            </SheetTrigger>
+
+            <LoginForm />
+          </Sheet>
         )}
       </div>
     </>
