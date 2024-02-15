@@ -6,6 +6,7 @@ import BookingItem from "../components/booking-item";
 import { Key } from "react";
 import { Booking } from "@prisma/client";
 import { authOptions } from "../lib/auth";
+import { AlertCircle } from "lucide-react";
 
 const BookingsPage = async () => {
   const session = await getServerSession(authOptions);
@@ -56,6 +57,13 @@ const BookingsPage = async () => {
 
       <div className="px-5 py-6">
         <h1 className="text-xl font-bold">Agendamentos</h1>
+
+        {!confirmedBookings.length && !finishedBookings.length && (
+          <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
+            <AlertCircle width={80} height={80} stroke="red" />
+            <p className="font-semibold mt-4">Não possui agendamentos ainda!</p>
+          </div>
+        )}
 
         {confirmedBookings.length > 0 && (
           <>
