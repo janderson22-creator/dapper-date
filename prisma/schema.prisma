@@ -26,11 +26,20 @@ model Establishment {
   imageUrl    String
   description String
   phoneNumber String
+  admin       Admin?
   services    Service[]
   bookings    Booking[]
   openingHours OpeningHour[]
   employees Employee[]
 }
+model Admin {
+  id               String        @id @default(uuid())
+  email            String        @unique
+  password         String
+  establishmentId  String        @unique
+  establishment    Establishment @relation(fields: [establishmentId], references: [id])
+}
+
 model Employee {
   id   String   @id @default(uuid())
   imageUrl    String
