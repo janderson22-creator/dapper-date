@@ -1,7 +1,5 @@
-import BookingItem from "@/app/components/booking-item";
-import { db } from "@/app/lib/prisma";
-import { Booking } from "@prisma/client";
 import React from "react";
+import ChosseEmployee from "../components/chosse-employee";
 
 interface AdminPageProps {
   params: {
@@ -10,23 +8,20 @@ interface AdminPageProps {
 }
 
 const AdminPage: React.FC<AdminPageProps> = async ({ params }) => {
-
-//   const bookings: Booking = await db.booking.findMany({
-//     where: {
-//       establishmentId: params.id,
-//     },
-//     include: {
-//       service: true,
-//       establishment: true,
-//       employee: true,
-//     },
-//   });
+  //   const bookings: Booking = await db.booking.findMany({
+  //     where: {
+  //       establishmentId: params.id,
+  //     },
+  //     include: {
+  //       service: true,
+  //       establishment: true,
+  //       employee: true,
+  //     },
+  //   });
 
   return (
     <div className="flex flex-col gap-4 mt-10 px-5">
-      {/* {bookings.map((booking: Booking, index: React.Key | null | undefined) => (
-        <BookingItem booking={booking} key={index} />
-      ))} */}
+      <ChosseEmployee paramsId={params.id} />
     </div>
   );
 };

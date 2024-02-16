@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "../lib/prisma";
+import { db } from "../../lib/prisma";
 
 export const getAdmin = async (email: string, password: string) => {
   const admin = await db.admin.findUnique({
