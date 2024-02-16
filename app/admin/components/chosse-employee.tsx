@@ -1,16 +1,35 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Admin } from "@prisma/client";
+import { Admin, Booking, Employee } from "@prisma/client";
 import { Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/app/components/ui/select";
+import { getEmployees } from "../actions/get-employees";
+import { format } from "date-fns";
+import BookingAdminItem from "./booking-admin-item";
 
 interface ChooseEmployeeProps {
   paramsId: string | undefined;
+  bookings: Booking;
 }
 
-const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({ paramsId }) => {
+const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({
+  paramsId,
+  bookings,
+}) => {
   const [loadingAdmin, setLoadingAdmin] = useState<boolean>(true);
+  const [employees, setEmployees] = useState<Employee[]>();
+  const [currentDate, setCurrentDate] = useState<string>("");
+  const [employeeSelected, setEmployeeSelected] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
@@ -30,8 +49,45 @@ const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({ paramsId }) => {
 
       setLoadingAdmin(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const fetchListEmployees = useCallback(async () => {
+    if (!paramsId) return null;
+    try {
+      const employees: Employee = await getEmployees(paramsId);
+
+      setEmployees(employees);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [paramsId]);
+
+  useEffect(() => {
+    if (!paramsId) return;
+    fetchListEmployees();
+
+    const currentDate = format(new Date(), "dd/MM/yyyy");
+    setCurrentDate(currentDate);
+  }, [fetchListEmployees, paramsId]);
+
+  function formatDate(date: Date): string {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear());
+    return `${day}/${month}/${year}`;
+  }
+
+  const bookingsByEmployeeAndDateSelected = useMemo(() => {
+    return bookings.filter((booking: Booking) => {
+      const bookingDateFormatted = formatDate(booking.date);
+
+      return (
+        booking.employeeId === employeeSelected &&
+        bookingDateFormatted === currentDate
+      );
+    });
+  }, [bookings, employeeSelected, currentDate]);
 
   return (
     <div>
@@ -40,7 +96,28 @@ const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({ paramsId }) => {
           <Loader2 className="h-16 w-16 animate-spin" />
         </div>
       ) : (
-        "É ADMIN"
+        <div>
+          <p className="text-center font-bold text-2xl mb-5">{currentDate}</p>
+
+          {employees?.map((employee, index) => (
+            <div
+              className="cursor-pointer"
+              onClick={() => setEmployeeSelected(employee.id)}
+              key={index}
+            >
+              {employee.name}
+            </div>
+          ))}
+
+          <div>
+            {bookingsByEmployeeAndDateSelected &&
+              bookingsByEmployeeAndDateSelected.map(
+                (booking: Booking, index: React.Key | null | undefined) => (
+                  <BookingAdminItem booking={booking} key={index} />
+                )
+              )}
+          </div>
+        </div>
       )}
     </div>
   );

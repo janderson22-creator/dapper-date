@@ -1,12 +1,7 @@
 "use client";
 
 import { signIn, signOut, useSession } from "next-auth/react";
-import {
-  Sheet,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./ui/sheet";
+import { Sheet, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
@@ -19,13 +14,30 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import LoginForm from "./login-admin";
+import { Admin } from "@prisma/client";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const SideMenu = () => {
+  const router = useRouter();
   const { data } = useSession();
+  const [admin, setAdmin] = useState<Admin>();
 
   const logoutClick = () => signOut();
 
   const loginClick = () => signIn("google");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const adminJson = localStorage.getItem("admin");
+
+      if (!adminJson) return;
+
+      const admin: Admin = JSON.parse(adminJson);
+
+      setAdmin(admin);
+    }
+  }, []);
 
   return (
     <>
@@ -81,18 +93,28 @@ const SideMenu = () => {
           </Button>
         )}
 
-        {!data?.user && (
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" className="justify-start">
-                <GanttChartSquare size={18} className="mr-2" />
-                Adiministrador
-              </Button>
-            </SheetTrigger>
+        {!data?.user &&
+          (admin ? (
+            <Button
+              onClick={() => router.push(`/admin/${admin.establishmentId}`)}
+              variant="outline"
+              className="justify-start"
+            >
+              <GanttChartSquare size={18} className="mr-2" />
+              Adiministrador
+            </Button>
+          ) : (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="justify-start">
+                  <GanttChartSquare size={18} className="mr-2" />
+                  Adiministrador
+                </Button>
+              </SheetTrigger>
 
-            <LoginForm />
-          </Sheet>
-        )}
+              <LoginForm />
+            </Sheet>
+          ))}
       </div>
     </>
   );
