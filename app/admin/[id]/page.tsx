@@ -24,7 +24,7 @@ const AdminPage: React.FC<AdminPageProps> = async ({ params }) => {
   });
 
   return (
-    <div className="flex flex-col gap-4 mt-10 px-5">
+    <div className="mt-8 px-5">
       <ChosseEmployee bookings={bookings} paramsId={params.id} />
     </div>
   );
