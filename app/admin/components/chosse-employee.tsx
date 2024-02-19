@@ -5,15 +5,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Admin, Booking, Employee } from "@prisma/client";
 import { ArrowDown, Loader2 } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/components/ui/select";
 import { getEmployees } from "../actions/get-employees";
 import { format } from "date-fns";
 import BookingAdminItem from "./booking-admin-item";
@@ -108,6 +99,13 @@ const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({
     setCurrentDate(date);
     setSheetIsOpen(false);
   };
+
+  bookingsByEmployeeAndDateSelected.sort(
+    (
+      a: { date: string | number | Date },
+      b: { date: string | number | Date }
+    ) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
 
   return (
     <div>
@@ -224,7 +222,7 @@ const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({
             )}
           </div>
 
-          {bookingsByEmployeeAndDateSelected.length > 0 && (
+          {bookingsByEmployeeAndDateSelected.length > 0 ? (
             <div className="flex flex-col mt-5">
               <h2 className="text-xs uppercase text-gray-400 font-bold mb-3">
                 Agendamentos
@@ -237,6 +235,12 @@ const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({
                   )
                 )}
               </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center mt-5">
+              <h2 className="text-xs uppercase text-gray-400 font-bold mb-3">
+                Nenhum agendamento por enquanto!
+              </h2>
             </div>
           )}
         </div>
