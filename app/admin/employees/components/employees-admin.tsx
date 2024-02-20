@@ -1,17 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { Card, CardContent } from "@/app/components/ui/card";
 import { Admin, Employee } from "@prisma/client";
-import {
-  ChangeEvent,
-  FormEvent,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Pencil, PlusCircle, Trash } from "lucide-react";
+import { Loader2, PlusCircle } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -19,6 +12,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/app/components/ui/sheet";
+import ImageUpload from "../../components/image-upload";
+import { Input } from "@/app/components/ui/input";
+import { Button } from "@/app/components/ui/button";
 
 interface EmployeesAdminProps {
   employees: Employee;
@@ -29,8 +25,10 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
   employees,
   paramsId,
 }) => {
-  const [loadingAdmin, setLoadingAdmin] = useState<boolean>(true);
   const [imageUrl, setImageUrl] = useState("");
+  const [name, setName] = useState("");
+  const [position, setPosition] = useState("");
+  const [loadingAdmin, setLoadingAdmin] = useState<boolean>(true);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [employeeSelected, setEmployeeSelected] = useState<
     Employee | undefined
@@ -67,6 +65,7 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
 
     if (!sheetIsOpen) {
       setEmployeeSelected(undefined);
+      setImageUrl("");
     }
   }, [sheetIsOpen]);
 
@@ -78,32 +77,6 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
       console.error(error);
     } finally {
     }
-  };
-
-  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-
-    if (file) {
-      const imageUrl = await convertBlobToUrl(file);
-
-      if (typeof imageUrl === "string") {
-        setImageUrl(imageUrl);
-      } else {
-        console.error("Failed to convert blob to URL");
-      }
-    }
-  };
-
-  const convertBlobToUrl = async (file: Blob) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-
-      reader.onloadend = () => {
-        resolve(reader.result as string);
-      };
-
-      reader.readAsDataURL(file);
-    });
   };
 
   return (
@@ -125,50 +98,45 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
               </SheetTrigger>
 
               <SheetContent>
-                <SheetHeader className="text-left px-5 py-2 border-b border-secondary">
+                <SheetHeader className="px-5 py-2 border-b border-secondary">
                   <SheetTitle>
                     {employeeSelected ? "Editar" : "Adicionar"} Profissional
                   </SheetTitle>
                 </SheetHeader>
 
-                <form onSubmit={submitClick} className="px-5 py-3">
-                  <label htmlFor="imageUrl" className="block mb-1">
-                    Imagem URL:
-                  </label>
-                  <input
-                    id="imageUrl"
-                    name="imageUrl"
-                    className="border border-gray-300 rounded px-3 py-2 mb-3"
-                    type="file"
-                    onChange={(e) => handleImageChange(e)}
+                <form
+                  onSubmit={submitClick}
+                  className="flex flex-col items-center mt-10"
+                >
+                  <ImageUpload
+                    height={170}
+                    width={170}
+                    rounded={1000}
+                    image={
+                      employeeSelected?.imageUrl || imageUrl || "/avatar.webp"
+                    }
+                    setImage={setImageUrl}
                   />
 
-                  <label htmlFor="name" className="block mb-1">
-                    Nome:
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    className="border border-gray-300 rounded px-3 py-2 mb-3"
-                  />
+                  <div className="w-full flex flex-col items-center gap-4">
+                    <Input
+                      placeholder="Nome"
+                      type="text"
+                      value={employeeSelected?.name || name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
 
-                  <label htmlFor="position" className="block mb-1">
-                    Cargo:
-                  </label>
-                  <input
-                    type="text"
-                    id="position"
-                    name="position"
-                    className="border border-gray-300 rounded px-3 py-2 mb-3"
-                  />
+                    <Input
+                      placeholder="Função"
+                      type="text"
+                      value={employeeSelected?.position || position}
+                      onChange={(e) => setPosition(e.target.value)}
+                      required
+                    />
+                  </div>
 
-                  <button
-                    type="submit"
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                  >
-                    Salvar
-                  </button>
+                  <Button className="w-full mt-5" type="submit">Salvar</Button>
                 </form>
               </SheetContent>
             </Sheet>
