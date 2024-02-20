@@ -3,9 +3,22 @@
 import Image from "next/image";
 import { Card, CardContent } from "@/app/components/ui/card";
 import { Admin, Employee } from "@prisma/client";
-import { useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Pencil, PlusCircle, Trash } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/app/components/ui/sheet";
 
 interface EmployeesAdminProps {
   employees: Employee;
@@ -17,6 +30,11 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
   paramsId,
 }) => {
   const [loadingAdmin, setLoadingAdmin] = useState<boolean>(true);
+  const [imageUrl, setImageUrl] = useState("");
+  const [sheetIsOpen, setSheetIsOpen] = useState(false);
+  const [employeeSelected, setEmployeeSelected] = useState<
+    Employee | undefined
+  >();
   const router = useRouter();
 
   useEffect(() => {
@@ -39,6 +57,55 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const editEmployee = (employee: Employee) => {
+    setEmployeeSelected(employee);
+    setSheetIsOpen(true);
+  };
+
+  useEffect(() => {
+    if (sheetIsOpen) return;
+
+    if (!sheetIsOpen) {
+      setEmployeeSelected(undefined);
+    }
+  }, [sheetIsOpen]);
+
+  const submitClick = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    try {
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  };
+
+  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      const imageUrl = await convertBlobToUrl(file);
+
+      if (typeof imageUrl === "string") {
+        setImageUrl(imageUrl);
+      } else {
+        console.error("Failed to convert blob to URL");
+      }
+    }
+  };
+
+  const convertBlobToUrl = async (file: Blob) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        resolve(reader.result as string);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  };
+
   return (
     <div>
       {loadingAdmin ? (
@@ -52,7 +119,59 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
               Profissionais
             </h2>
 
-            <PlusCircle />
+            <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
+              <SheetTrigger asChild>
+                <PlusCircle />
+              </SheetTrigger>
+
+              <SheetContent>
+                <SheetHeader className="text-left px-5 py-2 border-b border-secondary">
+                  <SheetTitle>
+                    {employeeSelected ? "Editar" : "Adicionar"} Profissional
+                  </SheetTitle>
+                </SheetHeader>
+
+                <form onSubmit={submitClick} className="px-5 py-3">
+                  <label htmlFor="imageUrl" className="block mb-1">
+                    Imagem URL:
+                  </label>
+                  <input
+                    id="imageUrl"
+                    name="imageUrl"
+                    className="border border-gray-300 rounded px-3 py-2 mb-3"
+                    type="file"
+                    onChange={(e) => handleImageChange(e)}
+                  />
+
+                  <label htmlFor="name" className="block mb-1">
+                    Nome:
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    className="border border-gray-300 rounded px-3 py-2 mb-3"
+                  />
+
+                  <label htmlFor="position" className="block mb-1">
+                    Cargo:
+                  </label>
+                  <input
+                    type="text"
+                    id="position"
+                    name="position"
+                    className="border border-gray-300 rounded px-3 py-2 mb-3"
+                  />
+
+                  <button
+                    type="submit"
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  >
+                    Salvar
+                  </button>
+                </form>
+              </SheetContent>
+            </Sheet>
           </div>
 
           <div className="flex items-center mt-4 pl-3 py-4 rounded-t-[10px] bg-transparent border">
@@ -69,6 +188,7 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
           <div className="flex flex-col gap-4 border border-t-transparent rounded-b-[10px]">
             {employees.map((employee: Employee, index: number) => (
               <div
+                onClick={() => editEmployee(employee)}
                 key={index}
                 className="flex items-center rounded-2xl bg-transparent py-3 relative"
               >
