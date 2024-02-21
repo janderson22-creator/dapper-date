@@ -10,6 +10,7 @@ interface EmployeesPageProps {
 }
 
 const Employees: React.FC<EmployeesPageProps> = async ({ params }) => {
+  
   const employees: Employee = await db.employee.findMany({
     where: {
       establishmentId: params.id,

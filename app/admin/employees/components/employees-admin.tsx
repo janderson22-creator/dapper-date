@@ -2,11 +2,18 @@
 
 import Image from "next/image";
 import { Admin, Employee } from "@prisma/client";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, PlusCircle } from "lucide-react";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
@@ -15,6 +22,10 @@ import {
 import ImageUpload from "../../components/image-upload";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
+import { saveEmployee } from "../../actions/employee/create-employee";
+import { toast } from "sonner";
+import { updateEmployee } from "../../actions/employee/update-employee";
+import { deleteEmployee } from "../../actions/employee/delete-employee";
 
 interface EmployeesAdminProps {
   employees: Employee;
@@ -25,14 +36,14 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
   employees,
   paramsId,
 }) => {
-  const [imageUrl, setImageUrl] = useState("");
-  const [name, setName] = useState("");
-  const [position, setPosition] = useState("");
   const [loadingAdmin, setLoadingAdmin] = useState<boolean>(true);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [employeeSelected, setEmployeeSelected] = useState<
     Employee | undefined
   >();
+  const [imageUrl, setImageUrl] = useState("");
+  const [name, setName] = useState("");
+  const [position, setPosition] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -57,6 +68,8 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
 
   const editEmployee = (employee: Employee) => {
     setEmployeeSelected(employee);
+    setName(employee.name);
+    setPosition(employee.position);
     setSheetIsOpen(true);
   };
 
@@ -66,18 +79,69 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
     if (!sheetIsOpen) {
       setEmployeeSelected(undefined);
       setImageUrl("");
+      setName("");
+      setPosition("");
     }
   }, [sheetIsOpen]);
 
-  const submitClick = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submitClick = useCallback(async () => {
+    if (!paramsId) return;
 
     try {
+      if (employeeSelected) {
+        await updateEmployee({
+          employeeId: employeeSelected.id,
+          imageUrl: imageUrl ? imageUrl : employeeSelected.imageUrl,
+          name,
+          position,
+          establishmentId: paramsId,
+        });
+
+        toast.success("Profissional editado com sucesso!", {
+          duration: 4000,
+          position: "top-center",
+        });
+
+        return;
+      }
+
+      if (!imageUrl || !name || !position || !paramsId) {
+        return;
+      }
+
+      await saveEmployee({
+        imageUrl,
+        name,
+        position,
+        establishmentId: paramsId,
+      });
+
+      toast.success("Profissional adicionado com sucesso!", {
+        duration: 4000,
+        position: "top-center",
+      });
     } catch (error) {
       console.error(error);
-    } finally {
     }
-  };
+  }, [employeeSelected, imageUrl, name, paramsId, position]);
+
+  const handleDeleteEmployee = useCallback(async () => {
+    if (!employeeSelected) return;
+
+    try {
+      await deleteEmployee({
+        employeeId: employeeSelected.id,
+      });
+
+      toast.success("Profissional deletado com sucesso!", {
+        duration: 4000,
+        position: "top-center",
+      });
+      
+    } catch (error) {
+      console.error(error);
+    }
+  }, [employeeSelected]);
 
   return (
     <div>
@@ -104,10 +168,7 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
                   </SheetTitle>
                 </SheetHeader>
 
-                <form
-                  onSubmit={submitClick}
-                  className="flex flex-col items-center mt-10"
-                >
+                <div className="flex flex-col items-center mt-10">
                   <ImageUpload
                     height={170}
                     width={170}
@@ -122,7 +183,7 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
                     <Input
                       placeholder="Nome"
                       type="text"
-                      value={employeeSelected?.name || name}
+                      value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
                     />
@@ -130,14 +191,35 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
                     <Input
                       placeholder="Função"
                       type="text"
-                      value={employeeSelected?.position || position}
+                      value={position}
                       onChange={(e) => setPosition(e.target.value)}
                       required
                     />
                   </div>
 
-                  <Button className="w-full mt-5" type="submit">Salvar</Button>
-                </form>
+                  <SheetClose asChild>
+                    <Button
+                      onClick={submitClick}
+                      className="w-full mt-5"
+                      type="submit"
+                    >
+                      Salvar
+                    </Button>
+                  </SheetClose>
+
+                  {employeeSelected && (
+                    <SheetClose asChild>
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleDeleteEmployee()}
+                        className="w-full mt-2"
+                        type="submit"
+                      >
+                        Excluir
+                      </Button>
+                    </SheetClose>
+                  )}
+                </div>
               </SheetContent>
             </Sheet>
           </div>
@@ -161,7 +243,7 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
                 className="flex items-center rounded-2xl bg-transparent py-3 relative"
               >
                 <div className="w-[10%] pl-3 text-gray-400 text-sm font-bold">
-                  {index}
+                  {index + 1}
                 </div>
 
                 <div className="pl-2 w-[25%]">
