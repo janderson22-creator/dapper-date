@@ -14,7 +14,7 @@ const HeaderAdmin: React.FC<HeaderAdminProps> = ({ paramsId }) => {
   return (
     <Card className="rounded-none">
       <CardContent className="p-5 flex items-center justify-between">
-        <Link href={"/"}>
+        <Link href={`/admin/${paramsId}`}>
           <Image src="/logo.png" alt="dapper date" height={22} width={120} />
         </Link>
 
