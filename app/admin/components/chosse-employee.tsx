@@ -177,13 +177,13 @@ const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({
                 <h2 className="text-xs uppercase text-gray-400 font-bold my-2">
                   Selecione um Profissional
                 </h2>
-                <div className="flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                <div className="flex gap-5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
                   {employees?.map((employee, index) => (
                     <Card
                       onClick={() => setEmployeeSelected(employee.id)}
                       key={index}
                       className={cn(
-                        "min-w-[160px] max-w-[160px] max-h-[280px] rounded-2xl",
+                        "min-w-[180px] max-w-[180px] max-h-[280px] rounded-2xl",
                         employee.id === employeeSelected && "bg-primary"
                       )}
                     >
@@ -237,11 +237,13 @@ const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center mt-5">
-              <h2 className="text-xs uppercase text-gray-400 font-bold mb-3">
-                Nenhum agendamento por enquanto!
-              </h2>
-            </div>
+            employeeSelected && (
+              <div className="flex items-center justify-center mt-5">
+                <h2 className="text-xs uppercase text-gray-400 font-bold mb-3">
+                  Nenhum agendamento por enquanto!
+                </h2>
+              </div>
+            )
           )}
         </div>
       )}
