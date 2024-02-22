@@ -38,7 +38,7 @@ const EmployeeItem: React.FC<EmployeeItemProps> = ({
         </Avatar>
       </div>
 
-      <h2 className="font-medium text-lg">{employee.name}</h2>
+      <h2 className="font-medium text-lg whitespace-nowrap">{employee.name}</h2>
       <p className="font-normal text-sm text-gray-400">{employee.position}</p>
     </div>
   );
