@@ -26,7 +26,7 @@ const ImageUpload: React.FC<Props> = ({
       if (!file) return;
 
       if (file.size >= 524288) {
-        toast.error("Image Size Exceeded");
+        toast.error("Tamanho da imagem excedida");
         return;
       }
 

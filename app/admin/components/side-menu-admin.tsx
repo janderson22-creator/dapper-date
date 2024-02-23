@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, LogOutIcon, UsersRound } from "lucide-react";
+import { Loader2, LogOutIcon, User, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { SheetClose, SheetHeader, SheetTitle } from "@/app/components/ui/sheet";
 import { Button } from "@/app/components/ui/button";
@@ -44,9 +44,16 @@ const SideMenuAdmin: React.FC<SideMenuProps> = ({ paramsId }) => {
 
       <div className="flex flex-col gap-3 px-5 mt-5">
         <Button variant="outline" className="justify-start" asChild>
-          <Link href={`employees/${paramsId}`}>
+          <Link href={`/admin/employees/${paramsId}`}>
             <UsersRound size={18} className="mr-2" />
             Profissinais
+          </Link>
+        </Button>
+
+        <Button variant="outline" className="justify-start" asChild>
+          <Link href={`/admin/profile/${paramsId}`}>
+            <User size={18} className="mr-2" />
+            Perfil
           </Link>
         </Button>
 
