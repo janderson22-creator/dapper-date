@@ -1,13 +1,20 @@
 "use client";
 
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Sheet, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
   CalendarIcon,
   GanttChartSquare,
   HomeIcon,
+  Loader2,
   LogInIcon,
   LogOutIcon,
   UserIcon,
@@ -17,11 +24,23 @@ import LoginForm from "./login-admin";
 import { Admin } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
 
 const SideMenu = () => {
   const router = useRouter();
   const { data } = useSession();
   const [admin, setAdmin] = useState<Admin>();
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const logoutClick = () => signOut();
 
@@ -38,6 +57,18 @@ const SideMenu = () => {
       setAdmin(admin);
     }
   }, []);
+
+  const logout = async () => {
+    setIsDeleteLoading(true);
+    try {
+      localStorage.removeItem("admin");
+      window.location.href = "/";
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsDeleteLoading(true);
+    }
+  };
 
   return (
     <>
@@ -117,6 +148,39 @@ const SideMenu = () => {
               <LoginForm />
             </Sheet>
           ))}
+
+        {admin && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" className="justify-start">
+                <LogOutIcon size={18} className="mr-2" />
+                Sair da conta admin
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="w-[90%] rounded-lg">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Sair da conta admin</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Tem certeza que deseja sair da conta?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="flex-row gap-3">
+                <AlertDialogCancel className="w-full mt-0">
+                  Voltar
+                </AlertDialogCancel>
+
+                <SheetClose asChild>
+                  <AlertDialogAction className="w-full" onClick={logout}>
+                    {isDeleteLoading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Confirmar
+                  </AlertDialogAction>
+                </SheetClose>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
     </>
   );
