@@ -57,6 +57,8 @@ model OpeningHour {
   dayOfWeek       String
   startTime       String 
   endTime         String
+  pauseAt         String?
+  backAt          String? 
 }
 
 model Service {
