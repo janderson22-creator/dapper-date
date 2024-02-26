@@ -179,6 +179,11 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
       getOpeningHourByDay.endTime.split(":")[0]
     );
 
+    const pauseAtFormatted = parseInt(
+      getOpeningHourByDay.pauseAt.split(":")[0]
+    );
+    const backAtFormatted = parseInt(getOpeningHourByDay.backAt.split(":")[0]);
+
     return generateDayTimeList(
       date,
       startTimeFormatted,
@@ -187,6 +192,12 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
       const timeHour = Number(time.split(":")[0]);
       const timeMinutes = Number(time.split(":")[1]);
 
+      // Verifica se o horário está dentro do intervalo de pausa
+      if (pauseAtFormatted <= timeHour && timeHour < backAtFormatted) {
+        return false; // Ignora horários dentro do intervalo de pausa
+      }
+
+      // Verifica se há uma reserva para o horário atual
       const bookingList = dayBookings.find((booking: Booking) => {
         const bookingHour = booking?.date.getHours();
         const bookingMinutes = booking?.date.getMinutes();
@@ -194,11 +205,8 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
         return bookingHour === timeHour && bookingMinutes === timeMinutes;
       });
 
-      if (!bookingList) {
-        return true;
-      }
-
-      return false;
+      // Retorna true apenas se não houver reserva para o horário atual
+      return !bookingList;
     });
   }, [date, dayBookings, getOpeningHourByDay]);
 
@@ -360,7 +368,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                               {establishment.name}
                             </h4>
                           </div>
-                          
+
                           {employeeSelected && (
                             <div className="flex justify-between text-sm">
                               <h3 className="text-gray-400">Profissional</h3>

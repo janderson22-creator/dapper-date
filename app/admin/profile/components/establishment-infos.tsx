@@ -11,9 +11,17 @@ import {
 import { Switch } from "@/app/components/ui/switch";
 import { Establishment, OpeningHour } from "@prisma/client";
 import { ArrowDown, Smartphone } from "lucide-react";
-import { Key, useCallback, useState } from "react";
+import { Key, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { updateOpeningHours } from "../../actions/opening-hours/update-opening-hour";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/app/components/ui/select";
+import EditHourOpening from "./edit-hour-opening";
 
 interface Props {
   establishment: Establishment;
@@ -22,6 +30,8 @@ interface Props {
 const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [pauseAt, setPauseAt] = useState("");
+  const [backAt, setBackAt] = useState("");
   const copyPhoneNumber = () => {
     navigator.clipboard.writeText(establishment.phoneNumber);
 
@@ -39,6 +49,8 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
           id,
           startTime: dayOff ? "" : startTime,
           endTime: dayOff ? "" : endTime,
+          pauseAt: dayOff ? "" : pauseAt,
+          backAt: dayOff ? "" : backAt,
         });
 
         toast.success("Horário alterado com sucesso!", {
@@ -49,7 +61,7 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
         console.error(error);
       }
     },
-    [endTime, startTime]
+    [backAt, endTime, pauseAt, startTime]
   );
 
   const compareDaysOfWeek = (a: OpeningHour, b: OpeningHour) => {
@@ -97,6 +109,8 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
                 onClick={() => {
                   setStartTime(item.startTime);
                   setEndTime(item.endTime);
+                  setPauseAt(item.pauseAt);
+                  setBackAt(item.backAt);
                 }}
                 asChild
               >
@@ -123,31 +137,32 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
                   <p className="text-center text-sm font-bold">
                     Expediente de {item.dayOfWeek}
                   </p>
-                  <div>
-                    <label className="text-xs text-gray-400" htmlFor="startAt">
-                      Inicia ás:
-                    </label>
-                    <Input
-                      id="startAt"
-                      name="startAt"
-                      type="text"
+
+                  <div className="flex items-center gap-4">
+                    <EditHourOpening
+                      label="Inicia"
                       value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                      required
+                      setValue={setStartTime}
+                    />
+
+                    <EditHourOpening
+                      label="Termina"
+                      value={endTime}
+                      setValue={setEndTime}
                     />
                   </div>
 
-                  <div>
-                    <label className="text-xs text-gray-400" htmlFor="endAt">
-                      Termina ás:
-                    </label>
-                    <Input
-                      id="endAt"
-                      name="endAt"
-                      type="text"
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                      required
+                  <div className="flex items-center gap-4">
+                    <EditHourOpening
+                      label="Pausa"
+                      value={pauseAt}
+                      setValue={setPauseAt}
+                    />
+
+                    <EditHourOpening
+                      label="Volta"
+                      value={backAt}
+                      setValue={setBackAt}
                     />
                   </div>
                 </div>
@@ -169,6 +184,7 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
                     <Button
                       onClick={() => submitClick(item.id, true)}
                       className="w-full"
+                      variant="secondary"
                     >
                       Não tenho expediente
                     </Button>
