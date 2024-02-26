@@ -6,7 +6,9 @@ import { revalidatePath } from "next/cache";
 interface UpdateHourParams {
   id: string;
   startTime: string;
-  endTime?: string;
+  endTime: string;
+  pauseAt: string;
+  backAt: string;
 }
 
 export const updateOpeningHours = async (params: UpdateHourParams) => {
@@ -17,6 +19,8 @@ export const updateOpeningHours = async (params: UpdateHourParams) => {
     data: {
       startTime: params.startTime,
       endTime: params.endTime,
+      pauseAt: params.pauseAt,
+      backAt: params.backAt,
     },
   });
 
