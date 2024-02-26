@@ -39,7 +39,7 @@ const EstablishmentDetailsPage: React.FC<
 
   return (
     <div>
-      <EstablishmentHeader establishment={establishment} />
+      <EstablishmentHeader admin={false} establishment={establishment} />
 
       <div className="pt-5">
         <Services establishment={establishment} HasUser={!!session?.user} />
