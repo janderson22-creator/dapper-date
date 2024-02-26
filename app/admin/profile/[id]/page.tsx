@@ -1,6 +1,7 @@
 import EstablishmentHeader from "@/app/establishments/[id]/components/establishment-header";
 import { Establishment } from "@prisma/client";
 import { db } from "@/app/lib/prisma";
+import EstablishmentAdminInfo from "../components/establishment-infos";
 
 interface ProfileProps {
   params: {
@@ -29,6 +30,8 @@ const Profile: React.FC<ProfileProps> = async ({ params }) => {
   return (
     <div>
       <EstablishmentHeader admin={true} establishment={establishment} />
+
+      <EstablishmentAdminInfo establishment={establishment} />
     </div>
   );
 };
