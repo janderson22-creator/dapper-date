@@ -9,27 +9,8 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "../lib/utils";
 import {
   Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
-import Image from "next/image";
-import { Button } from "./ui/button";
-import { Loader2 } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "./ui/alert-dialog";
 import BookingInfo from "./booking-info";
 
 interface BookingItemProps {

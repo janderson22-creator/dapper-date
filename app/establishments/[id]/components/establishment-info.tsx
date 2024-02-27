@@ -22,6 +22,25 @@ const EstablishmentInfo: React.FC<Props> = ({ establishment }) => {
     });
   };
 
+  const compareDaysOfWeek = (a: OpeningHour, b: OpeningHour) => {
+    const daysOfWeekOrder = [
+      "domingo",
+      "segunda-feira",
+      "terca-feira",
+      "quarta-feira",
+      "quinta-feira",
+      "sexta-feira",
+      "sabado",
+    ];
+
+    return (
+      daysOfWeekOrder.indexOf(a.dayOfWeek) -
+      daysOfWeekOrder.indexOf(b.dayOfWeek)
+    );
+  };
+
+  const sortedOpeningHours = establishment.openingHours.sort(compareDaysOfWeek);
+
   return (
     <div>
       <p className="text-gray-400 font-bold uppercase">sobre nós</p>
@@ -40,7 +59,7 @@ const EstablishmentInfo: React.FC<Props> = ({ establishment }) => {
       </div>
 
       <div className="pb-12">
-        {establishment.openingHours.map(
+        {sortedOpeningHours.map(
           (item: OpeningHour, key: Key | null | undefined) => (
             <div
               className="text-sm flex items-center justify-between mb-2.5 last-of-type:mb-0"
