@@ -9,9 +9,11 @@ import {
 import ImageUpload from "../../components/image-upload";
 import { Input } from "@/app/components/ui/input";
 import { Establishment } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Textarea } from "@/app/components/ui/textarea";
+import { updateEstablishment } from "../../actions/establishment-info/update-establishment";
+import { toast } from "sonner";
 
 interface EditProfileProps {
   establishment: Establishment;
@@ -37,6 +39,26 @@ const EditProfile: React.FC<EditProfileProps> = ({ establishment }) => {
     establishment.name,
     establishment.phoneNumber,
   ]);
+
+  const submitClick = useCallback(async () => {
+    try {
+      await updateEstablishment({
+        id: establishment.id,
+        imageUrl,
+        name,
+        phoneNumber,
+        address,
+        description,
+      });
+
+      toast.success("Informações do estabelecimento alterado com sucesso!", {
+        duration: 4000,
+        position: "top-center",
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, [address, description, establishment.id, imageUrl, name, phoneNumber]);
 
   return (
     <SheetContent className="p-3">
@@ -117,7 +139,11 @@ const EditProfile: React.FC<EditProfileProps> = ({ establishment }) => {
         </div>
 
         <SheetClose asChild>
-          <Button className="w-full mt-5" type="submit">
+          <Button
+            onClick={() => submitClick()}
+            className="w-full mt-5"
+            type="submit"
+          >
             Salvar
           </Button>
         </SheetClose>
