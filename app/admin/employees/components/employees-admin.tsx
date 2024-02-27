@@ -137,7 +137,6 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
         duration: 4000,
         position: "top-center",
       });
-      
     } catch (error) {
       console.error(error);
     }
@@ -257,7 +256,7 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
                   />
                 </div>
 
-                <div className="pl-2 w-[35%] text-xs font-semibold mt-2">
+                <div className="pl-2 w-[35%] text-xs font-semibold whitespace-nowrap text-ellipsis overflow-hidden">
                   {employee.name}
                 </div>
 
