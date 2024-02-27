@@ -11,7 +11,7 @@ import {
 import { Switch } from "@/app/components/ui/switch";
 import { Establishment, OpeningHour } from "@prisma/client";
 import { ArrowDown, Smartphone } from "lucide-react";
-import { Key, useCallback, useEffect, useState } from "react";
+import { Key, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { updateOpeningHours } from "../../actions/opening-hours/update-opening-hour";
 import {
@@ -44,6 +44,10 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
 
   const submitClick = useCallback(
     async (id: string, dayOff: boolean) => {
+      if (startTime && !endTime) {
+        return toast.error("Horário final do expediente não preenchido");
+      }
+
       try {
         await updateOpeningHours({
           id,
@@ -82,6 +86,12 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
   };
 
   const sortedOpeningHours = establishment.openingHours.sort(compareDaysOfWeek);
+
+  const disabledButton = useMemo(() => {
+    if (!startTime || !endTime || !pauseAt || !backAt) return true;
+
+    return false;
+  }, [backAt, endTime, pauseAt, startTime]);
 
   return (
     <div className="p-4">
@@ -169,6 +179,7 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
 
                 <SheetClose asChild>
                   <Button
+                    disabled={disabledButton}
                     onClick={() => submitClick(item.id, false)}
                     className="w-full mt-5"
                   >
