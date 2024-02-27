@@ -7,7 +7,6 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -32,6 +31,7 @@ import { useRouter } from "next/navigation";
 import { getDayBookings } from "../actions/get-day-bookings";
 import EmployeeItem from "./employee-item";
 import { cn } from "@/app/lib/utils";
+import sendWhatsAppMessage from "../helpers/send-message-whatsapp";
 
 interface ServiceItemProps {
   establishment: Establishment;
@@ -140,13 +140,27 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
         date: newDate,
       });
 
+      setTimeout(async () => {
+        const message = `Nova reserva para ${
+          employeeSelected.name
+        } foi realizada com sucesso para ${format(
+          newDate,
+          "'o dia' dd 'de' MMMM 'ás' HH:mm",
+          {
+            locale: ptBR,
+          }
+        )}.`;
+        const whatsappNumber = establishment.phoneNumber;
+        await sendWhatsAppMessage(whatsappNumber, message);
+      }, 3000);
+
       setSheetIsOpen(false);
       setHour(undefined);
       setDate(undefined);
       toast.success("Reserva realizada com sucesso!", {
         duration: 6000,
         position: "top-center",
-        description: format(newDate, "'Para' dd 'de' MMMM 'ás' HH':'mm'.'", {
+        description: format(newDate, "'Para' dd 'de' MMMM 'ás' HH':'mm''", {
           locale: ptBR,
         }),
         action: {
@@ -164,6 +178,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     date,
     employeeSelected,
     establishment.id,
+    establishment.phoneNumber,
     hour,
     router,
     service.id,

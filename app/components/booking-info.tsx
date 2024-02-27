@@ -29,8 +29,9 @@ import { Booking } from "@prisma/client";
 import { ptBR } from "date-fns/locale";
 import { cancelBooking } from "../actions/cancel-booking";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarImage } from "./ui/avatar";
+import sendWhatsAppMessage from "../establishments/[id]/helpers/send-message-whatsapp";
 
 interface BookingInfoProps {
   booking: Booking;
@@ -38,6 +39,7 @@ interface BookingInfoProps {
 
 const BookingInfo: React.FC<BookingInfoProps> = ({ booking }) => {
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+
   const cancelClick = async () => {
     setIsDeleteLoading(true);
 
@@ -45,12 +47,29 @@ const BookingInfo: React.FC<BookingInfoProps> = ({ booking }) => {
       await cancelBooking(booking.id);
 
       toast.success("Reserva cancelada com sucesso!");
+
+      setTimeout(async () => {
+        const message = `Óla, sou ${
+          booking.user?.name
+        }, estou cancelando a reserva para ${
+          booking.employee?.name
+        }, peço desculpas pois tive um imprevisto ${format(
+          booking.date,
+          "'no dia' dd 'de' MMMM 'ás' HH:mm",
+          {
+            locale: ptBR,
+          }
+        )}.`;
+        const whatsappNumber = booking.establishment?.phoneNumber;
+        await sendWhatsAppMessage(whatsappNumber, message);
+      }, 3000);
     } catch (error) {
       console.error(error);
     } finally {
       setIsDeleteLoading(false);
     }
   };
+
   return (
     <SheetContent className="w-11/12 px-0">
       <SheetHeader className="px-5 text-left pb-6 border-b border-secondary">
