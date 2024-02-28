@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Admin, Booking, Employee } from "@prisma/client";
 import { ArrowDown, Loader2 } from "lucide-react";
-import { getEmployees } from "../actions/get-employees";
+import { getEmployees } from "../actions/employee/get-employees";
 import { format } from "date-fns";
 import BookingAdminItem from "./booking-admin-item";
 import {

@@ -28,6 +28,8 @@ import { updateEmployee } from "../../actions/employee/update-employee";
 import { deleteEmployee } from "../../actions/employee/delete-employee";
 import { Card, CardContent } from "@/app/components/ui/card";
 import { Textarea } from "@/app/components/ui/textarea";
+import { updateService } from "../../actions/service/update-service";
+import { saveService } from "../../actions/service/create-service";
 
 interface EmployeesAdminProps {
   services: Service;
@@ -46,7 +48,7 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
   const [imageUrl, setImageUrl] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState<number | undefined>();
+  const [price, setPrice] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -85,9 +87,58 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
       setImageUrl("");
       setName("");
       setDescription("");
-      setPrice(undefined);
+      setPrice("");
     }
   }, [sheetIsOpen]);
+
+  const submitClick = useCallback(async () => {
+    if (!paramsId) return;
+
+    try {
+      if (serviceSelected) {
+        await updateService({
+          serviceId: serviceSelected.id,
+          imageUrl: imageUrl ? imageUrl : serviceSelected.imageUrl,
+          name,
+          description,
+          price: parseFloat(price),
+        });
+
+        toast.success("Serviço editado com sucesso!", {
+          duration: 4000,
+          position: "top-center",
+        });
+
+        return;
+      }
+
+      if (!imageUrl || !name || !description || !paramsId) {
+        return;
+      }
+
+      await saveService({
+        imageUrl,
+        name,
+        description,
+        price: parseFloat(price),
+        establishmentId: paramsId,
+      });
+
+      toast.success("Serviço adicionado com sucesso!", {
+        duration: 4000,
+        position: "top-center",
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, [description, imageUrl, name, paramsId, price, serviceSelected]);
+
+  useEffect(() => {
+    console.log(imageUrl);
+    console.log(name);
+    console.log(description);
+    console.log(description);
+  }, [description, imageUrl, name]);
 
   return (
     <div>
@@ -139,7 +190,7 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
                       placeholder="Preço"
                       type="number"
                       value={price}
-                      onChange={(e) => setPrice(parseFloat(e.target.value))}
+                      onChange={(e) => setPrice(e.target.value)}
                       required
                     />
 
@@ -159,7 +210,7 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
 
                   <SheetClose asChild>
                     <Button
-                      // onClick={submitClick}
+                      onClick={submitClick}
                       className="w-full mt-5"
                       type="submit"
                     >
@@ -184,7 +235,7 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
             </Sheet>
           </div>
 
-          <div className="flex flex-col gap-4 border border-t-transparent rounded-b-[10px]">
+          <div className="flex flex-col gap-4">
             {services.map((service: Service, index: number) => (
               <Card onClick={() => editService(service)} key={index}>
                 <CardContent className="flex items-center gap-4 p-3">
