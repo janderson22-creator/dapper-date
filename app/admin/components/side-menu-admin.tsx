@@ -1,6 +1,12 @@
 "use client";
 
-import { Loader2, LogOutIcon, User, UsersRound } from "lucide-react";
+import {
+  GanttChart,
+  Loader2,
+  LogOutIcon,
+  User,
+  UsersRound,
+} from "lucide-react";
 import Link from "next/link";
 import { SheetClose, SheetHeader, SheetTitle } from "@/app/components/ui/sheet";
 import { Button } from "@/app/components/ui/button";
@@ -47,6 +53,13 @@ const SideMenuAdmin: React.FC<SideMenuProps> = ({ paramsId }) => {
           <Link href={`/admin/employees/${paramsId}`}>
             <UsersRound size={18} className="mr-2" />
             Profissinais
+          </Link>
+        </Button>
+
+        <Button variant="outline" className="justify-start" asChild>
+          <Link href={`/admin/services/${paramsId}`}>
+            <GanttChart size={18} className="mr-2" />
+            Serviços
           </Link>
         </Button>
 

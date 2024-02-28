@@ -65,11 +65,11 @@ model Service {
   id              String        @id @default(uuid())
   name            String
   price           Decimal       @db.Decimal(10, 2)
+  description     String
+  imageUrl String
   establishmentId String
   establishment   Establishment @relation(fields: [establishmentId], references: [id])
-  description     String
   booking         Booking[]
-  imageUrl String
 }
 model Booking {
   id   String   @id @default(uuid())
