@@ -7,6 +7,7 @@ import {
   FormEvent,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
@@ -156,6 +157,18 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
     }
   }, [employeeSelected]);
 
+  const employeeHasBookings = useMemo(() => {
+    if (!employeeSelected) return false;
+
+    const areThereBookings = employeeSelected.bookings.length;
+
+    if (areThereBookings) {
+      return true;
+    }
+
+    return false;
+  }, [employeeSelected]);
+
   return (
     <div>
       {loadingAdmin ? (
@@ -233,7 +246,9 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
                             Excluir Profissional
                           </AlertDialogTitle>
                           <AlertDialogDescription>
-                            Tem certeza que deseja remover esse profissional?
+                            {employeeHasBookings
+                              ? "Esse profissional não pode ser excluido, pois tem agendamentos em aberto para ele, dúvidas falar com nosso suporte"
+                              : "Tem certeza que deseja remover esse profissional?"}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter className="flex-row gap-3">
@@ -243,6 +258,7 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
 
                           <SheetClose asChild>
                             <AlertDialogAction
+                              disabled={employeeHasBookings}
                               className="w-full"
                               onClick={() => handleDeleteEmployee()}
                             >
