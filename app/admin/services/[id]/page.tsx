@@ -16,6 +16,7 @@ const Services: React.FC<EmployeesPageProps> = async ({ params }) => {
     },
     include: {
       establishment: true,
+      booking: true
     },
   });
 

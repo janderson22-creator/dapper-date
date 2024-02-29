@@ -11,7 +11,6 @@ interface AdminPageProps {
 }
 
 const AdminPage: React.FC<AdminPageProps> = async ({ params }) => {
-  
   const bookings: Booking = await db.booking.findMany({
     where: {
       establishmentId: params.id,
@@ -27,6 +26,8 @@ const AdminPage: React.FC<AdminPageProps> = async ({ params }) => {
   return (
     <div>
       <HeaderAdmin paramsId={params.id} />
+
+      <h1 className="text-lg text-center mt-5 font-bold">Agendamentos</h1>
 
       <div className="mt-6 px-5">
         <ChosseEmployee bookings={bookings} paramsId={params.id} />

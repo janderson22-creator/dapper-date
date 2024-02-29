@@ -26,6 +26,17 @@ import { saveEmployee } from "../../actions/employee/create-employee";
 import { toast } from "sonner";
 import { updateEmployee } from "../../actions/employee/update-employee";
 import { deleteEmployee } from "../../actions/employee/delete-employee";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/app/components/ui/alert-dialog";
 
 interface EmployeesAdminProps {
   employees: Employee;
@@ -36,6 +47,7 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
   employees,
   paramsId,
 }) => {
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [loadingAdmin, setLoadingAdmin] = useState<boolean>(true);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [employeeSelected, setEmployeeSelected] = useState<
@@ -127,7 +139,7 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
 
   const handleDeleteEmployee = useCallback(async () => {
     if (!employeeSelected) return;
-
+    setIsDeleteLoading(true);
     try {
       await deleteEmployee({
         employeeId: employeeSelected.id,
@@ -139,6 +151,8 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
       });
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsDeleteLoading(false);
     }
   }, [employeeSelected]);
 
@@ -207,16 +221,40 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
                   </SheetClose>
 
                   {employeeSelected && (
-                    <SheetClose asChild>
-                      <Button
-                        variant="destructive"
-                        onClick={() => handleDeleteEmployee()}
-                        className="w-full mt-2"
-                        type="submit"
-                      >
-                        Excluir
-                      </Button>
-                    </SheetClose>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" className="w-full mt-2">
+                          Excluir
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="w-[90%] rounded-lg">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Excluir Profissional
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Tem certeza que deseja remover esse profissional?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="flex-row gap-3">
+                          <AlertDialogCancel className="w-full mt-0">
+                            Voltar
+                          </AlertDialogCancel>
+
+                          <SheetClose asChild>
+                            <AlertDialogAction
+                              className="w-full"
+                              onClick={() => handleDeleteEmployee()}
+                            >
+                              {isDeleteLoading && (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              )}
+                              Confirmar
+                            </AlertDialogAction>
+                          </SheetClose>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   )}
                 </div>
               </SheetContent>

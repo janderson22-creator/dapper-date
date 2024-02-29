@@ -1,14 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Admin, Employee, Service } from "@prisma/client";
-import {
-  ChangeEvent,
-  FormEvent,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { Admin, Booking, Employee, Service } from "@prisma/client";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, PlusCircle } from "lucide-react";
 import {
@@ -22,14 +16,23 @@ import {
 import ImageUpload from "../../components/image-upload";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
-import { saveEmployee } from "../../actions/employee/create-employee";
 import { toast } from "sonner";
-import { updateEmployee } from "../../actions/employee/update-employee";
-import { deleteEmployee } from "../../actions/employee/delete-employee";
 import { Card, CardContent } from "@/app/components/ui/card";
 import { Textarea } from "@/app/components/ui/textarea";
 import { updateService } from "../../actions/service/update-service";
 import { saveService } from "../../actions/service/create-service";
+import { deleteService } from "../../actions/service/delete-service";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/app/components/ui/alert-dialog";
 
 interface EmployeesAdminProps {
   services: Service;
@@ -40,6 +43,7 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
   services,
   paramsId,
 }) => {
+  const [isServiceLoading, setIsServiceLoading] = useState(false);
   const [loadingAdmin, setLoadingAdmin] = useState<boolean>(true);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [serviceSelected, setServiceSelected] = useState<
@@ -133,12 +137,38 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
     }
   }, [description, imageUrl, name, paramsId, price, serviceSelected]);
 
-  useEffect(() => {
-    console.log(imageUrl);
-    console.log(name);
-    console.log(description);
-    console.log(description);
-  }, [description, imageUrl, name]);
+  const handleDeleteService = useCallback(async () => {
+    if (!serviceSelected) return;
+    setIsServiceLoading(true);
+    try {
+      await deleteService({
+        serviceId: serviceSelected.id,
+      });
+
+      toast.success("Serviço deletado com sucesso!", {
+        duration: 4000,
+        position: "top-center",
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsServiceLoading(false);
+    }
+  }, [serviceSelected]);
+
+  // const serviceHasBookings = useMemo(() => {
+  //   if (!serviceSelected) return false;
+
+  //   const verifyBookings = serviceSelected.booking.some((booking: Booking) => {
+  //     booking.serviceId === serviceSelected.id;
+  //   });
+
+  //   return verifyBookings ? true : false;
+  // }, [serviceSelected]);
+
+  // useEffect(() => {
+  //   console.log(serviceHasBookings);
+  // }, [serviceHasBookings]);
 
   return (
     <div>
@@ -219,16 +249,38 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
                   </SheetClose>
 
                   {serviceSelected && (
-                    <SheetClose asChild>
-                      <Button
-                        variant="destructive"
-                        // onClick={() => handleDeleteEmployee()}
-                        className="w-full mt-2"
-                        type="submit"
-                      >
-                        Excluir
-                      </Button>
-                    </SheetClose>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" className="w-full mt-2">
+                          Excluir
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="w-[90%] rounded-lg">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Excluir Serviço</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Tem certeza que deseja remover esse serviço?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="flex-row gap-3">
+                          <AlertDialogCancel className="w-full mt-0">
+                            Voltar
+                          </AlertDialogCancel>
+
+                          <SheetClose asChild>
+                            <AlertDialogAction
+                              className="w-full"
+                              onClick={() => handleDeleteService()}
+                            >
+                              {isServiceLoading && (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              )}
+                              Confirmar
+                            </AlertDialogAction>
+                          </SheetClose>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   )}
                 </div>
               </SheetContent>
