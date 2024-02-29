@@ -156,19 +156,17 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
     }
   }, [serviceSelected]);
 
-  // const serviceHasBookings = useMemo(() => {
-  //   if (!serviceSelected) return false;
+  const serviceHasBookings = useMemo(() => {
+    if (!serviceSelected) return false;
 
-  //   const verifyBookings = serviceSelected.booking.some((booking: Booking) => {
-  //     booking.serviceId === serviceSelected.id;
-  //   });
+    const areThereBookings = serviceSelected.booking.length;
 
-  //   return verifyBookings ? true : false;
-  // }, [serviceSelected]);
+    if (areThereBookings) {
+      return true;
+    }
 
-  // useEffect(() => {
-  //   console.log(serviceHasBookings);
-  // }, [serviceHasBookings]);
+    return false;
+  }, [serviceSelected]);
 
   return (
     <div>
@@ -259,7 +257,9 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
                         <AlertDialogHeader>
                           <AlertDialogTitle>Excluir Serviço</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Tem certeza que deseja remover esse serviço?
+                            {serviceHasBookings
+                              ? "Esse serviço não pode ser excluir pois possui agendamentos em aberto para ele, falar com nosso suporte."
+                              : "Tem certeza que deseja remover esse serviço?"}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter className="flex-row gap-3">
@@ -269,6 +269,7 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
 
                           <SheetClose asChild>
                             <AlertDialogAction
+                              disabled={serviceHasBookings}
                               className="w-full"
                               onClick={() => handleDeleteService()}
                             >
