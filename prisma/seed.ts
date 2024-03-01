@@ -122,6 +122,7 @@ async function seedDatabase() {
           imageUrl: imageUrl,
           description: description,
           phoneNumber: phoneNumber,
+          slug: name.replace(/\s+/g, "").replace(/[^\w\s]/gi, ""),
           openingHours: {
             create: [
               {

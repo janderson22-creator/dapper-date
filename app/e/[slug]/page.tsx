@@ -1,6 +1,4 @@
 import { db } from "@/app/lib/prisma";
-import ServiceItem from "./components/service-item";
-import { Key } from "react";
 import { Establishment, Service } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
@@ -9,7 +7,7 @@ import Services from "./components/services";
 
 interface EstablishmentDetailsPageProps {
   params: {
-    id?: string;
+    slug?: string;
   };
 }
 
@@ -18,18 +16,18 @@ const EstablishmentDetailsPage: React.FC<
 > = async ({ params }) => {
   const session = await getServerSession(authOptions);
 
-  if (!params.id) {
+  if (!params.slug) {
     return null;
   }
 
   const establishment: Establishment = await db.establishment.findUnique({
     where: {
-      id: params.id,
+      slug: params.slug,
     },
     include: {
       services: true,
       openingHours: true,
-      employees: true
+      employees: true,
     },
   });
 

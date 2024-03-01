@@ -29,9 +29,9 @@ import { Booking } from "@prisma/client";
 import { ptBR } from "date-fns/locale";
 import { cancelBooking } from "../actions/cancel-booking";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Avatar, AvatarImage } from "./ui/avatar";
-import sendWhatsAppMessage from "../establishments/[id]/helpers/send-message-whatsapp";
+import sendWhatsAppMessage from "../e/[slug]/helpers/send-message-whatsapp";
 
 interface BookingInfoProps {
   booking: Booking;
