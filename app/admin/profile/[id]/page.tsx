@@ -1,4 +1,4 @@
-import EstablishmentHeader from "@/app/establishments/[id]/components/establishment-header";
+import EstablishmentHeader from "@/app/e/[slug]/components/establishment-header";
 import { Establishment } from "@prisma/client";
 import { db } from "@/app/lib/prisma";
 import EstablishmentAdminInfo from "../components/establishment-infos";
