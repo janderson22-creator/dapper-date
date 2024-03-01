@@ -1,9 +1,12 @@
-import { db } from "@/app/lib/prisma";
+"use client";
+
 import { Establishment, Service } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/lib/auth";
 import EstablishmentHeader from "./components/establishment-header";
 import Services from "./components/services";
+import { useCallback, useEffect, useState } from "react";
+import { getEstablishment } from "@/app/actions/get-establishment";
+import EstablishmentSkeleton from "./components/establishment-skeleton";
+import { useRouter } from "next/navigation";
 
 interface EstablishmentDetailsPageProps {
   params: {
@@ -11,36 +14,47 @@ interface EstablishmentDetailsPageProps {
   };
 }
 
-const EstablishmentDetailsPage: React.FC<
-  EstablishmentDetailsPageProps
-> = async ({ params }) => {
-  const session = await getServerSession(authOptions);
+const EstablishmentDetailsPage: React.FC<EstablishmentDetailsPageProps> = ({
+  params,
+}) => {
+  const route = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [currentEstablishment, setCurrentEstablishment] =
+    useState<Establishment>();
+  const [hasUser, setHasUser] = useState<boolean>();
 
-  if (!params.slug) {
-    return null;
+  const fetchEstablishment = useCallback(async () => {
+    if (!params.slug) return null;
+    setLoading(true);
+    try {
+      const establishment: Establishment = await getEstablishment(params.slug);
+
+      if (!establishment.establishment) return route.replace("/");
+      setCurrentEstablishment(establishment.establishment);
+      setHasUser(!!establishment.session);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [params.slug, route]);
+
+  useEffect(() => {
+    fetchEstablishment();
+  }, [fetchEstablishment]);
+
+  if (loading) {
+    return <EstablishmentSkeleton />;
   }
 
-  const establishment: Establishment = await db.establishment.findUnique({
-    where: {
-      slug: params.slug,
-    },
-    include: {
-      services: true,
-      openingHours: true,
-      employees: true,
-    },
-  });
-
-  if (!establishment) {
-    return null;
-  }
+  if (!currentEstablishment) return;
 
   return (
     <div>
-      <EstablishmentHeader admin={false} establishment={establishment} />
+      <EstablishmentHeader admin={false} establishment={currentEstablishment} />
 
       <div className="pt-5">
-        <Services establishment={establishment} HasUser={!!session?.user} />
+        <Services establishment={currentEstablishment} HasUser={hasUser} />
       </div>
     </div>
   );
