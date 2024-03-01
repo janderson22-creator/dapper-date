@@ -229,7 +229,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     <Card>
       <CardContent className="flex items-center gap-4 p-3">
         <Image
-          src={service.imageUrl}
+          src={service.imageUrl || ""}
           alt={""}
           width={0}
           height={0}

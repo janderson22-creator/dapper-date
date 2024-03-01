@@ -5,6 +5,8 @@ import { db } from "../lib/prisma";
 import { Establishment } from "@prisma/client";
 import { redirect } from "next/navigation";
 import Search from "../(home)/components/search";
+import Link from "next/link";
+import { ChevronLeftIcon } from "lucide-react";
 
 interface EstablishmentPageProps {
   searchParams: {
@@ -33,13 +35,19 @@ const EstablishmentsPage: React.FC<EstablishmentPageProps> = async ({
       <Header />
 
       <div className="px-5 py-6 flex flex-col gap-6">
-        <Search
-          defaultValues={{
-            search: searchParams.search,
-          }}
-        />
+        <div className="flex items-center w-full">
+          <Link className="flex items-center justify-center border w-10 h-10 rounded-lg mr-2" href="/">
+            <ChevronLeftIcon />
+          </Link>
+          <Search
+            defaultValues={{
+              search: searchParams.search,
+            }}
+          />
+        </div>
         <h1 className="text-gray-400 font-bold text-xs uppercase">
-          Resultados para &quot;{searchParams.search}&quot;
+          {!establishments.length && "Não houve "}Resultados para &quot;
+          {searchParams.search}&quot;
         </h1>
 
         <div className="flex flex-wrap gap-3 mt-3">

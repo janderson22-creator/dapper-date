@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from "@/app/components/ui/form";
 import { Input } from "@/app/components/ui/input";
-import { SearchIcon } from "lucide-react";
+import { ChevronLeftIcon, SearchIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -38,7 +38,7 @@ const Search = ({ defaultValues }: SearchProps) => {
   });
 
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
-    router.push(`/establishments?search=${data.search}`);
+    router.push(`/e?search=${data.search}`);
   };
 
   return (

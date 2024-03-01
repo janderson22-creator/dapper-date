@@ -8,7 +8,7 @@ import EstablishmentInfo from "./establishment-info";
 
 interface Props {
   establishment: Establishment;
-  HasUser: boolean;
+  HasUser: boolean | undefined;
 }
 
 const Services: React.FC<Props> = ({ establishment, HasUser }) => {
@@ -31,7 +31,7 @@ const Services: React.FC<Props> = ({ establishment, HasUser }) => {
 
       {optionSelected === "serviços" && (
         <div className="flex flex-col gap-3 px-5 pt-6">
-          {establishment.services?.map(
+          {establishment?.services?.map(
             (service: Service, index: Key | null | undefined) => (
               <ServiceItem
                 key={index}

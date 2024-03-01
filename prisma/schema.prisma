@@ -26,6 +26,7 @@ model Establishment {
   imageUrl    String
   description String
   phoneNumber String
+  slug String @unique
   admin       Admin?
   services    Service[]
   bookings    Booking[]
