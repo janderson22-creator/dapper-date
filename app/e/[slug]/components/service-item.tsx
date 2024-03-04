@@ -160,7 +160,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
       toast.success("Reserva realizada com sucesso!", {
         duration: 6000,
         position: "top-center",
-        description: format(newDate, "'Para' dd 'de' MMMM 'ás' HH':'mm''", {
+        description: format(newDate, "'Para' dd 'de' MMMM 'ás' HH':'mm'", {
           locale: ptBR,
         }),
         action: {

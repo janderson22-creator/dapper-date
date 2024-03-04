@@ -1,52 +1,45 @@
-import { getServerSession } from "next-auth";
+"use client";
+
 import Header from "../components/header";
-import { redirect } from "next/navigation";
-import { db } from "../lib/prisma";
 import BookingItem from "../components/booking-item";
-import { Key } from "react";
+import { Key, useCallback, useEffect, useState } from "react";
 import { Booking } from "@prisma/client";
-import { authOptions } from "../lib/auth";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CalendarX2 } from "lucide-react";
+import { getBookings } from "../actions/get-bookings";
+import { Skeleton } from "../components/ui/skeleton";
+import LoadingBookings from "./components/loading";
 
-const BookingsPage = async () => {
-  const session = await getServerSession(authOptions);
+const BookingsPage = () => {
+  const [loading, setLoading] = useState(false);
+  const [confirmedBookings, setConfirmedBookings] = useState<Booking>();
+  const [finishedBookings, setFinishedBookings] = useState<Booking>();
 
-  if (!session?.user) {
-    return redirect("/");
-  }
+  const fetchBookings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const bookings: Booking = await getBookings();
 
-  const [confirmedBookings, finishedBookings] = await Promise.all([
-    db.booking.findMany({
-      where: {
-        userId: (session.user as any).id,
-        date: {
-          gte: new Date(),
-        },
-      },
-      include: {
-        service: true,
-        establishment: true,
-        employee: true,
-        user: true
-      },
-    }),
-    db.booking.findMany({
-      where: {
-        userId: (session.user as any).id,
-        date: {
-          lt: new Date(),
-        },
-      },
-      include: {
-        service: true,
-        establishment: true,
-        employee: true,
-        user: true
-      },
-    }),
-  ]);
+      setConfirmedBookings(bookings.confirmedBookings);
+      setFinishedBookings(bookings.finishedBookings);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  confirmedBookings.sort(
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
+
+  confirmedBookings?.sort(
+    (
+      a: { date: string | number | Date },
+      b: { date: string | number | Date }
+    ) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
+  finishedBookings?.sort(
     (
       a: { date: string | number | Date },
       b: { date: string | number | Date }
@@ -54,50 +47,63 @@ const BookingsPage = async () => {
   );
 
   return (
-    <div>
+    <>
       <Header />
 
-      <div className="px-5 py-6">
-        <h1 className="text-xl font-bold">Agendamentos</h1>
+      {loading ? (
+        <LoadingBookings />
+      ) : (
+        <div>
+          <div className="px-5 py-6">
+            <h1 className="text-xl font-bold">Agendamentos</h1>
 
-        {!confirmedBookings.length && !finishedBookings.length && (
-          <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
-            <AlertCircle width={80} height={80} stroke="red" />
-            <p className="font-semibold mt-4">Não possui agendamentos ainda!</p>
+            {!confirmedBookings?.length && !finishedBookings?.length && (
+              <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
+                <CalendarX2
+                  width={50}
+                  height={50}
+                  stroke="red"
+                  className="opacity-65"
+                />
+                <p className="font-semibold mt-4">
+                  Não possui agendamentos ainda!
+                </p>
+              </div>
+            )}
+
+            {confirmedBookings?.length > 0 && (
+              <>
+                <h2 className="text-gray-400 font-bold uppercase text-sm mt-6 mb-3">
+                  Confirmados
+                </h2>
+                <div className="flex flex-col gap-3">
+                  {confirmedBookings.map(
+                    (booking: Booking, index: Key | null | undefined) => (
+                      <BookingItem booking={booking} key={index} />
+                    )
+                  )}
+                </div>
+              </>
+            )}
+
+            {finishedBookings?.length > 0 && (
+              <>
+                <h2 className="text-gray-400 font-bold uppercase text-sm mt-6 mb-3">
+                  Finalizados
+                </h2>
+                <div className="flex flex-col gap-3">
+                  {finishedBookings.map(
+                    (booking: Booking, index: Key | null | undefined) => (
+                      <BookingItem booking={booking} key={index} />
+                    )
+                  )}
+                </div>
+              </>
+            )}
           </div>
-        )}
-
-        {confirmedBookings.length > 0 && (
-          <>
-            <h2 className="text-gray-400 font-bold uppercase text-sm mt-6 mb-3">
-              Confirmados
-            </h2>
-            <div className="flex flex-col gap-3">
-              {confirmedBookings.map(
-                (booking: Booking, index: Key | null | undefined) => (
-                  <BookingItem booking={booking} key={index} />
-                )
-              )}
-            </div>
-          </>
-        )}
-
-        {finishedBookings.length > 0 && (
-          <>
-            <h2 className="text-gray-400 font-bold uppercase text-sm mt-6 mb-3">
-              Finalizados
-            </h2>
-            <div className="flex flex-col gap-3">
-              {finishedBookings.map(
-                (booking: Booking, index: Key | null | undefined) => (
-                  <BookingItem booking={booking} key={index} />
-                )
-              )}
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 
