@@ -264,6 +264,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
 
                 <div className="py-2">
                   <Calendar
+                    showOutsideDays={false}
                     className="w-full h-[50%]"
                     mode="single"
                     selected={date}
