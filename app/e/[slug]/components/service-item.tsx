@@ -53,7 +53,9 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   >();
   const [submitIsLoading, setSubmitIsLoading] = useState(false);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
+  const [sheetConfirmIsOpen, setSheetConfirmIsOpen] = useState(false);
   const [dayBookings, setDayBookings] = useState<Booking>([]);
+  const [booking, setBooking] = useState<Date | undefined>();
 
   const getDayOfWeek = (date: Date): string => {
     const daysOfWeek = [
@@ -140,23 +142,8 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
         date: newDate,
       });
 
-      setTimeout(async () => {
-        const message = `Nova reserva para ${
-          employeeSelected.name
-        } foi realizada com sucesso para ${format(
-          newDate,
-          "'o dia' dd 'de' MMMM 'ás' HH:mm",
-          {
-            locale: ptBR,
-          }
-        )}.`;
-        const whatsappNumber = establishment.phoneNumber;
-        await sendWhatsAppMessage(whatsappNumber, message);
-      }, 3000);
+      setBooking(newDate);
 
-      setSheetIsOpen(false);
-      setHour(undefined);
-      setDate(undefined);
       toast.success("Reserva realizada com sucesso!", {
         duration: 6000,
         position: "top-center",
@@ -178,7 +165,6 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     date,
     employeeSelected,
     establishment.id,
-    establishment.phoneNumber,
     hour,
     router,
     service.id,
@@ -224,6 +210,36 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
       return !bookingList;
     });
   }, [date, dayBookings, getOpeningHourByDay]);
+
+  const sendMessage = () => {
+    if (!booking) return;
+
+    const message = `Nova reserva para ${
+      employeeSelected.name
+    } foi realizada com sucesso para ${format(
+      booking,
+      "'o dia' dd 'de' MMMM 'ás' HH:mm",
+      {
+        locale: ptBR,
+      }
+    )}.`;
+    const whatsappNumber = establishment.phoneNumber;
+
+    sendWhatsAppMessage(whatsappNumber, message);
+    setSheetConfirmIsOpen(false);
+    setBooking(undefined);
+    setHour(undefined);
+    setDate(undefined);
+  };
+
+  useEffect(() => {
+    if (sheetConfirmIsOpen) return;
+
+    setBooking(undefined);
+    setBooking(undefined);
+    setHour(undefined);
+    setDate(undefined);
+  }, [sheetConfirmIsOpen]);
 
   return (
     <Card>
@@ -333,7 +349,10 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                   </div>
                 )}
 
-                <Sheet>
+                <Sheet
+                  open={sheetConfirmIsOpen}
+                  onOpenChange={setSheetConfirmIsOpen}
+                >
                   <SheetTrigger asChild>
                     <Button
                       className="absolute bottom-5 left-0 right-0 w-[87%] mx-auto"
@@ -397,18 +416,42 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                       </Card>
                     </div>
 
-                    <SheetClose asChild>
+                    <Button
+                      className="w-full"
+                      onClick={bookingSubmit}
+                      disabled={
+                        !date ||
+                        !hour ||
+                        submitIsLoading ||
+                        booking !== undefined
+                      }
+                    >
+                      {submitIsLoading && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      {booking ? "Reserva confirmada" : "Confirmar reserva"}
+                    </Button>
+
+                    {booking && (
+                      <SheetClose asChild>
+                        <Button
+                          className="w-full mt-3 bg-green-500 border-none"
+                          onClick={() => sendMessage()}
+                        >
+                          Confirmar via whatsapp
+                        </Button>
+                      </SheetClose>
+                    )}
+
+                    {booking && (
                       <Button
-                        className="w-full"
-                        onClick={bookingSubmit}
-                        disabled={!date || !hour || submitIsLoading}
+                        variant="secondary"
+                        className="w-full mt-3"
+                        onClick={() => router.push("/bookings")}
                       >
-                        {submitIsLoading && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        Confirmar reserva
+                        Ver meus agendamentos
                       </Button>
-                    </SheetClose>
+                    )}
                   </SheetContent>
                 </Sheet>
               </SheetContent>
