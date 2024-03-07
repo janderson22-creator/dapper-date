@@ -1,17 +1,30 @@
 import { cn } from "@/app/lib/utils";
 import { ArrowDown } from "lucide-react";
-import { Dispatch, SetStateAction, useState, useRef, useEffect } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+} from "react";
 
 interface EditHourOpeningProps {
   label: string;
   value: string;
   setValue: Dispatch<SetStateAction<string>>;
+  startTime?: string;
+  pauseAt?: string;
+  endTime?: string;
 }
 
 const EditHourOpening: React.FC<EditHourOpeningProps> = ({
   label,
   value,
   setValue,
+  startTime,
+  endTime,
+  pauseAt,
 }) => {
   const [openTimes, setOpenTimes] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -29,19 +42,61 @@ const EditHourOpening: React.FC<EditHourOpeningProps> = ({
     };
   }, []);
 
+  const filteredTimes = useMemo(() => {
+    if (label === "Termina") {
+      return startTime ? times.filter((time) => time > startTime) : times;
+    }
+
+    if (label === "Volta") {
+      return pauseAt && endTime
+        ? times.filter((time) => time > pauseAt && time < endTime)
+        : times;
+    }
+
+    if (label === "Pausa") {
+      return startTime && endTime
+        ? times.filter((time) => time > startTime && time < endTime)
+        : times;
+    }
+
+    return times;
+  }, [endTime, label, pauseAt, startTime]);
+
+  const disabled = useMemo(() => {
+    if (label === "Termina") {
+      return startTime ? false : true;
+    }
+
+    if (label === "Volta") {
+      return pauseAt ? false : true;
+    }
+
+    if (label === "Pausa") {
+      return startTime && endTime ? false : true;
+    }
+
+    return false;
+  }, [endTime, label, pauseAt, startTime]);
+
   return (
     <div className="w-full" ref={ref}>
       <label className="text-xs text-gray-400" htmlFor="startAt">
         {label} ás:
       </label>
       <div
-        onClick={() => setOpenTimes(!openTimes)}
+        onClick={() => !disabled && setOpenTimes(!openTimes)}
         className={cn(
-          "relative border  py-2 w-full rounded-lg border-secondary min-h-[38px]"
+          "relative border py-2 w-full rounded-lg border-secondary min-h-[38px]",
+          disabled && "opacity-50"
         )}
       >
         <div className="flex items-center justify-between pr-2">
-          <p className={cn("text-sm font-medium px-2", !value && "text-xs")}>
+          <p
+            className={cn(
+              "whitespace-nowrap text-sm font-medium px-2",
+              !value && "text-xs"
+            )}
+          >
             {value ? value : "Selecione um horário"}
           </p>
 
@@ -58,13 +113,13 @@ const EditHourOpening: React.FC<EditHourOpeningProps> = ({
         {openTimes && (
           <div
             className={cn(
-              "bg-secondary absolute top-11 border border-white px-5 rounded-lg w-full flex flex-col items-center gap-2 max-h-[150px] overflow-scroll z-10"
+              "bg-secondary absolute top-11 border border-white border-opacity-30 px-5 rounded-lg w-full flex flex-col items-center gap-2 max-h-[150px] overflow-scroll z-10"
             )}
           >
-            {times.map((time, key) => (
+            {filteredTimes.map((time, key) => (
               <p
                 onClick={() => setValue(time)}
-                className="text-sm text-center font-semibold border-b border-gray-400 w-full py-2 text-gray-300 last-of-type:border-none"
+                className="text-sm text-center font-semibold border-b border-gray-500 w-full py-2 text-gray-300 last-of-type:border-none"
                 key={key}
               >
                 {time}

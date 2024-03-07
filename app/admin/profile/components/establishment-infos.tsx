@@ -11,7 +11,7 @@ import {
 import { Switch } from "@/app/components/ui/switch";
 import { Establishment, OpeningHour } from "@prisma/client";
 import { ArrowDown, Smartphone } from "lucide-react";
-import { Key, useCallback, useEffect, useMemo, useState } from "react";
+import { Key, useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { updateOpeningHours } from "../../actions/opening-hours/update-opening-hour";
 import EditHourOpening from "./edit-hour-opening";
@@ -149,6 +149,7 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
                     />
 
                     <EditHourOpening
+                      startTime={startTime}
                       label="Termina"
                       value={endTime}
                       setValue={setEndTime}
@@ -157,12 +158,16 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
 
                   <div className="flex items-center gap-4">
                     <EditHourOpening
+                      startTime={startTime}
+                      endTime={endTime}
                       label="Pausa"
                       value={pauseAt}
                       setValue={setPauseAt}
                     />
 
                     <EditHourOpening
+                      pauseAt={pauseAt}
+                      endTime={endTime}
                       label="Volta"
                       value={backAt}
                       setValue={setBackAt}
