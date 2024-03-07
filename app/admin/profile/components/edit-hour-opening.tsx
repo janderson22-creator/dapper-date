@@ -1,7 +1,6 @@
-"use client";
-
 import { cn } from "@/app/lib/utils";
-import { Dispatch, SetStateAction, useState } from "react";
+import { ArrowDown } from "lucide-react";
+import { Dispatch, SetStateAction, useState, useRef, useEffect } from "react";
 
 interface EditHourOpeningProps {
   label: string;
@@ -15,8 +14,23 @@ const EditHourOpening: React.FC<EditHourOpeningProps> = ({
   setValue,
 }) => {
   const [openTimes, setOpenTimes] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setOpenTimes(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="w-full">
+    <div className="w-full" ref={ref}>
       <label className="text-xs text-gray-400" htmlFor="startAt">
         {label} ás:
       </label>
@@ -26,9 +40,21 @@ const EditHourOpening: React.FC<EditHourOpeningProps> = ({
           "relative border  py-2 w-full rounded-lg border-secondary min-h-[38px]"
         )}
       >
-        <p className={cn("text-sm font-medium px-2", !value && "text-xs")}>
-          {value ? value : "Selecione um horário"}
-        </p>
+        <div className="flex items-center justify-between pr-2">
+          <p className={cn("text-sm font-medium px-2", !value && "text-xs")}>
+            {value ? value : "Selecione um horário"}
+          </p>
+
+          <div
+            className={cn(
+              "",
+              openTimes && "scale-100 transition-all rotate-180"
+            )}
+          >
+            <ArrowDown size={16} />
+          </div>
+        </div>
+
         {openTimes && (
           <div
             className={cn(

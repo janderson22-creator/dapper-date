@@ -14,13 +14,6 @@ import { ArrowDown, Smartphone } from "lucide-react";
 import { Key, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { updateOpeningHours } from "../../actions/opening-hours/update-opening-hour";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/components/ui/select";
 import EditHourOpening from "./edit-hour-opening";
 
 interface Props {
