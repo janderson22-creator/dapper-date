@@ -56,7 +56,7 @@ export default async function Home() {
         </p>
       </div>
 
-      <div className="px-5 mt-6">
+      <div className="px-5 mt-6 lg:w-5/12">
         <Search />
       </div>
 
@@ -78,12 +78,12 @@ export default async function Home() {
         )}
       </div>
 
-      <div className="mt-6">
-        <h2 className="px-5 text-xs uppercase text-gray-400 font-bold mb-3">
+      <div className="mt-6 lg:mt-8">
+        <h2 className="px-5 text-xs uppercase text-gray-400 font-bold mb-3 lg:mb-5">
           Recomendados
         </h2>
 
-        <div className="flex flex-col px-5 gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+        <div className="flex flex-col lg:flex-row lg:flex-wrap px-5 gap-2 lg:gap-10 lg:ml-5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
           {establishments.map(
             (establishment: Establishment, key: Key | null | undefined) => (
               <EstablishmentItem key={key} establishment={establishment} />
