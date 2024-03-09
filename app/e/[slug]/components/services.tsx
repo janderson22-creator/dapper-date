@@ -30,7 +30,7 @@ const Services: React.FC<Props> = ({ establishment, HasUser }) => {
       </div>
 
       {optionSelected === "serviços" && (
-        <div className="flex flex-col gap-3 px-5 pt-6">
+        <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3 lg:gap-4 px-5 pt-6">
           {establishment?.services?.map(
             (service: Service, index: Key | null | undefined) => (
               <ServiceItem

@@ -76,11 +76,11 @@ const EstablishmentHeader: React.FC<EstablishmentInfoProps> = ({
           src={establishment?.imageUrl || ""}
           fill
           alt={establishment?.name || ""}
-          className="object-cover opacity-75"
+          className="object-cover lg:object-fill opacity-75"
         />
       </div>
 
-      <div className="px-5 pt-3 pb-6 border-b border-secondary">
+      <div className="max-w-[1280px] m-auto px-5 pt-3 pb-6 border-b border-secondary">
         <h1 className="text-xl font-bold">{establishment?.name}</h1>
         <div className="flex items-center gap-2 mt-2">
           <MapPinIcon className="text-primary" size={18} />

@@ -53,8 +53,10 @@ const EstablishmentDetailsPage: React.FC<EstablishmentDetailsPageProps> = ({
     <div>
       <EstablishmentHeader admin={false} establishment={currentEstablishment} />
 
-      <div className="pt-5">
-        <Services establishment={currentEstablishment} HasUser={hasUser} />
+      <div className="m-auto max-w-[1280px]">
+        <div className="pt-5">
+          <Services establishment={currentEstablishment} HasUser={hasUser} />
+        </div>
       </div>
     </div>
   );
