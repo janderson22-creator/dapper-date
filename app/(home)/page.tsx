@@ -45,52 +45,54 @@ export default async function Home() {
       <Header />
       <HeaderWeb />
 
-      <div className="px-5 pt-5">
-        <h2 className="text-xl font-bold">
-          {session?.user
-            ? `Óla, ${session.user.name?.split(" ")[0]}!`
-            : "Óla, vamos agendar um serviço?"}
-        </h2>
-        <p className="capitalize text-sm">
-          {format(new Date(), "EEEE',' dd 'de' MMMM", {
-            locale: ptBR,
-          })}
-        </p>
-      </div>
+      <div className="max-w-[1280px] m-auto">
+        <div className="px-5 pt-5">
+          <h2 className="text-xl font-bold">
+            {session?.user
+              ? `Óla, ${session.user.name?.split(" ")[0]}!`
+              : "Óla, vamos agendar um serviço?"}
+          </h2>
+          <p className="capitalize text-sm">
+            {format(new Date(), "EEEE',' dd 'de' MMMM", {
+              locale: ptBR,
+            })}
+          </p>
+        </div>
 
-      <div className="px-5 mt-6 lg:w-5/12">
-        <Search />
-      </div>
+        <div className="px-5 mt-6 lg:w-5/12">
+          <Search />
+        </div>
 
-      <div className="mt-6">
-        {confirmedBookings.length > 0 && (
-          <>
-            <h2 className="pl-3 text-xs uppercase text-gray-400 font-bold mb-3">
-              Agendamentos
-            </h2>
+        <div className="mt-6">
+          {confirmedBookings.length > 0 && (
+            <>
+              <h2 className="pl-3 text-xs lg:text-lg uppercase text-gray-400 font-bold mb-3">
+                Agendamentos
+              </h2>
 
-            <div className="px-3 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-              {confirmedBookings.map(
-                (booking: Booking, index: Key | null | undefined) => (
-                  <BookingItem booking={booking} key={index} />
-                )
-              )}
-            </div>
-          </>
-        )}
-      </div>
-
-      <div className="mt-6 lg:mt-8">
-        <h2 className="px-5 text-xs uppercase text-gray-400 font-bold mb-3 lg:mb-5">
-          Recomendados
-        </h2>
-
-        <div className="flex flex-col lg:flex-row lg:flex-wrap px-5 gap-2 lg:gap-10 lg:ml-5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          {establishments.map(
-            (establishment: Establishment, key: Key | null | undefined) => (
-              <EstablishmentItem key={key} establishment={establishment} />
-            )
+              <div className="px-3 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                {confirmedBookings.map(
+                  (booking: Booking, index: Key | null | undefined) => (
+                    <BookingItem booking={booking} key={index} />
+                  )
+                )}
+              </div>
+            </>
           )}
+        </div>
+
+        <div className="mt-6 lg:mt-8">
+          <h2 className="px-5 text-xs lg:text-lg uppercase text-gray-400 font-bold mb-3 lg:mb-5">
+            Recomendados
+          </h2>
+
+          <div className="flex flex-col lg:flex-row lg:flex-wrap px-5 gap-2 lg:gap-10 lg:ml-5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+            {establishments.map(
+              (establishment: Establishment, key: Key | null | undefined) => (
+                <EstablishmentItem key={key} establishment={establishment} />
+              )
+            )}
+          </div>
         </div>
       </div>
     </div>

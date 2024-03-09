@@ -242,7 +242,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   }, [sheetConfirmIsOpen]);
 
   return (
-    <Card>
+    <Card className="lg:max-w-[350px]">
       <CardContent className="flex items-center gap-4 p-3">
         <Image
           src={service.imageUrl || ""}
