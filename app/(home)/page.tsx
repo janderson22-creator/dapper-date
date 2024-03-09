@@ -9,6 +9,7 @@ import { Key } from "react";
 import { Booking, Establishment } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
+import HeaderWeb from "../components/ui/header-web";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -42,6 +43,7 @@ export default async function Home() {
   return (
     <div>
       <Header />
+      <HeaderWeb />
 
       <div className="px-5 pt-5">
         <h2 className="text-xl font-bold">

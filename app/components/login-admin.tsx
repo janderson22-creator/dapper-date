@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { FormEvent, useState } from "react";
 import { SheetContent } from "./ui/sheet";
@@ -39,7 +39,10 @@ const LoginForm = () => {
   };
 
   return (
-    <SheetContent side="bottom">
+    <SheetContent
+      side="bottom"
+      className="bottom-0 top-0 w-[350px] lg:max-h-[300px] lg:m-auto lg:rounded-[10px]"
+    >
       <form onSubmit={submitClick}>
         <div className="flex flex-col gap-1">
           <label className="font-semibold text-gray-200" htmlFor="email">

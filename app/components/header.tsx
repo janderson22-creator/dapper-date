@@ -8,7 +8,7 @@ import Link from "next/link";
 
 const Header = () => {
   return (
-    <Card className="rounded-none">
+    <Card className="rounded-none lg:hidden">
       <CardContent className="p-5 flex items-center justify-between">
         <Link href={"/"} >
         <Image src="/logo.png" alt="dapper date" height={22} width={120} />

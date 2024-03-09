@@ -36,6 +36,21 @@
   }
 }
 
+::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background-color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  background: #ffffff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #000000ae;
+  border-radius: 5px;
+}
+
 @layer base {
   * {
     @apply border-border;
