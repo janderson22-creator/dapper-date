@@ -4,9 +4,8 @@ import Header from "../components/header";
 import BookingItem from "../components/booking-item";
 import { Key, useCallback, useEffect, useState } from "react";
 import { Booking } from "@prisma/client";
-import { AlertCircle, CalendarX2 } from "lucide-react";
+import { CalendarX2 } from "lucide-react";
 import { getBookings } from "../actions/get-bookings";
-import { Skeleton } from "../components/ui/skeleton";
 import LoadingBookings from "./components/loading";
 import HeaderWeb from "../components/ui/header-web";
 
@@ -79,7 +78,7 @@ const BookingsPage = () => {
                   <h2 className="text-gray-400 font-bold uppercase text-sm mt-6 mb-3">
                     Confirmados
                   </h2>
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col lg:flex-row lg:flex-wrap lg:justify-between gap-y-3">
                     {confirmedBookings.map(
                       (booking: Booking, index: Key | null | undefined) => (
                         <BookingItem booking={booking} key={index} />
@@ -94,7 +93,7 @@ const BookingsPage = () => {
                   <h2 className="text-gray-400 font-bold uppercase text-sm lg:text-base mt-6 mb-3">
                     Finalizados
                   </h2>
-                  <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3">
+                  <div className="flex flex-col lg:flex-row lg:flex-wrap lg:justify-between gap-y-3">
                     {finishedBookings.map(
                       (booking: Booking, index: Key | null | undefined) => (
                         <BookingItem booking={booking} key={index} />
