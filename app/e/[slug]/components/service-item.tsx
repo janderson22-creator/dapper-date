@@ -48,6 +48,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   const { data } = useSession();
   const [date, setDate] = useState<Date | undefined>();
   const [hour, setHour] = useState<string | undefined>();
+  const [loadingEmployeeSelected, setLoadingEmployeeSelected] = useState(false);
   const [employeeSelected, setEmployeeSelected] = useState<
     Employee | undefined
   >();
@@ -170,8 +171,24 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     service.id,
   ]);
 
+  const changeEmployee = useCallback(async (employee: Employee) => {
+    setLoadingEmployeeSelected(true);
+    try {
+      setHour(undefined);
+      setEmployeeSelected(employee);
+    } finally {
+      setLoadingEmployeeSelected(false);
+    }
+  }, []);
+
   const timeList = useMemo(() => {
-    if (!date || !getOpeningHourByDay) return [];
+    if (
+      !date ||
+      !getOpeningHourByDay ||
+      loadingEmployeeSelected ||
+      !employeeSelected
+    )
+      return [];
 
     const startTimeFormatted = parseInt(
       getOpeningHourByDay.startTime.split(":")[0]
@@ -206,10 +223,15 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
         return bookingHour === timeHour && bookingMinutes === timeMinutes;
       });
 
-      // Retorna true apenas se não houver reserva para o horário atual
       return !bookingList;
     });
-  }, [date, dayBookings, getOpeningHourByDay]);
+  }, [
+    date,
+    dayBookings,
+    employeeSelected,
+    getOpeningHourByDay,
+    loadingEmployeeSelected,
+  ]);
 
   const sendMessage = () => {
     if (!booking) return;
@@ -314,38 +336,54 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                 </div>
 
                 {getOpeningHourByDay && (
-                  <div
-                    className={cn(
-                      "flex gap-3 py-4 px-5 border-t border-secondary overflow-x-auto [&::-webkit-scrollbar]:hidden",
-                      establishment.employees.length <= 2 &&
-                        "items-center justify-center"
-                    )}
-                  >
-                    {establishment.employees.map(
-                      (employee: Employee, index: Key | null | undefined) => (
-                        <EmployeeItem
-                          employeeSelected={employeeSelected}
-                          setEmployeeSelected={setEmployeeSelected}
-                          employee={employee}
-                          key={index}
-                        />
-                      )
-                    )}
+                  <div className="border-t border-secondary py-4">
+                    <h2 className="pl-3 text-xs uppercase text-gray-400 font-bold mb-3">
+                      Selecione um profissional
+                    </h2>
+                    <div
+                      className={cn(
+                        "flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden",
+                        establishment.employees.length <= 2 &&
+                          "items-center justify-center"
+                      )}
+                    >
+                      {establishment.employees.map(
+                        (employee: Employee, index: Key | null | undefined) => (
+                          <EmployeeItem
+                            employeeSelected={employeeSelected}
+                            setEmployeeSelected={changeEmployee}
+                            employee={employee}
+                            key={index}
+                          />
+                        )
+                      )}
+                    </div>
                   </div>
                 )}
 
                 {employeeSelected && (
-                  <div className="flex gap-3 py-4 px-5 border-t border-secondary overflow-x-auto [&::-webkit-scrollbar]:hidden">
-                    {timeList.map((time, index) => (
-                      <Button
-                        onClick={() => setHour(time)}
-                        variant={hour === time ? "default" : "outline"}
-                        className="rounded-full"
-                        key={index}
-                      >
-                        {time}
-                      </Button>
-                    ))}
+                  <div className="border-t border-secondary py-4">
+                    <h2 className="pl-3 text-xs uppercase text-gray-400 font-bold mb-3">
+                      Selecione um horário
+                    </h2>
+                    <div className="flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                      {!loadingEmployeeSelected && timeList.length ? (
+                        timeList.map((time, index) => (
+                          <Button
+                            onClick={() => setHour(time)}
+                            variant={hour === time ? "default" : "outline"}
+                            className="rounded-full"
+                            key={index}
+                          >
+                            {time}
+                          </Button>
+                        ))
+                      ) : (
+                        <p className="text-sm text-center font-semibold text-red-400">
+                          Não possui mais horários disponiveis para este dia.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
 
