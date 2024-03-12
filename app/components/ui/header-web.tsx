@@ -66,7 +66,7 @@ const HeaderWeb = () => {
   };
 
   return (
-    <Card className="rounded-none">
+    <Card className="hidden lg:flex rounded-none">
       <CardContent className="max-w-[1280px] m-auto p-5 pr-10 flex items-center justify-between">
         <Link href={"/"}>
           <Image src="/logo.png" alt="dapper date" height={22} width={120} />
@@ -129,16 +129,12 @@ const HeaderWeb = () => {
 
               <AlertDialog>
                 <AlertDialogTrigger className="cursor-pointer" asChild>
-                  <LogOutIcon
-                    onClick={logoutClick}
-                    size={20}
-                    className="ml-4"
-                  />
+                  <LogOutIcon size={20} className="ml-4" />
                 </AlertDialogTrigger>
 
                 <AlertDialogContent className="w-[90%] rounded-lg">
                   <AlertDialogHeader className="flex items-center">
-                    <AlertDialogTitle>Sair da conta admin</AlertDialogTitle>
+                    <AlertDialogTitle>Sair da conta</AlertDialogTitle>
                     <AlertDialogDescription>
                       Tem certeza que deseja sair da conta?
                     </AlertDialogDescription>
@@ -149,7 +145,7 @@ const HeaderWeb = () => {
                       Voltar
                     </AlertDialogCancel>
 
-                    <AlertDialogAction className="w-full" onClick={logout}>
+                    <AlertDialogAction className="w-full" onClick={logoutClick}>
                       {isDeleteLoading && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}

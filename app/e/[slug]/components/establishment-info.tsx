@@ -11,10 +11,9 @@ interface Props {
 }
 
 const EstablishmentInfo: React.FC<Props> = ({ establishment }) => {
-
   const copyPhoneNumber = () => {
     navigator.clipboard.writeText(establishment.phoneNumber);
-    
+
     toast.success("Copiado!", {
       duration: 6000,
       position: "top-center",
@@ -70,7 +69,7 @@ const EstablishmentInfo: React.FC<Props> = ({ establishment }) => {
               <div className="flex">
                 <p>
                   {item.startTime
-                    ? `${item.startTime} - ${item.endTime}`
+                    ? `${item.startTime} - ${item.pauseAt} / ${item.backAt} - ${item.endTime}`
                     : "Fechado"}
                 </p>
               </div>
