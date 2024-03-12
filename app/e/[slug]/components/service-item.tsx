@@ -118,7 +118,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     setEmployeeSelected(undefined);
   };
 
-  const bookingClick = () => {
+  const loginClick = () => {
     if (!isAuthenticated) {
       return signIn("google");
     }
@@ -288,211 +288,243 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
             </p>
             <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
               <SheetTrigger asChild>
-                <Button onClick={bookingClick} variant="secondary">
-                  Reservar
-                </Button>
+                <Button variant="secondary">Reservar</Button>
               </SheetTrigger>
 
-              <SheetContent className="p-0 w-10/12">
-                <SheetHeader className="text-left px-5 py-2 border-b border-secondary">
-                  <SheetTitle>Fazer Reserva</SheetTitle>
-                </SheetHeader>
+              {!isAuthenticated ? (
+                <SheetContent side="bottom" className="p-0 pb-10 lg:rounded-lg rounded-t-lg w-full lg:w-10/12 lg:left-0 lg:right-0 lg:top-0 lg:bottom-0 lg:m-auto h-fit">
+                  <SheetHeader className="text-left px-5 py-2 border-b border-secondary">
+                    <SheetTitle>Fazer Reserva</SheetTitle>
+                  </SheetHeader>
 
-                {/* React Day Picker Below */}
-
-                <div className="py-2">
-                  <Calendar
-                    showOutsideDays={false}
-                    className="w-full h-[50%]"
-                    mode="single"
-                    selected={date}
-                    onSelect={dateClick}
-                    locale={ptBR}
-                    fromDate={new Date()}
-                    styles={{
-                      head_cell: {
-                        width: "100%",
-                        textTransform: "capitalize",
-                      },
-                      cell: {
-                        width: "100%",
-                      },
-                      button: {
-                        width: "100%",
-                      },
-                      nav_button_previous: {
-                        width: "32px",
-                        height: "32px",
-                      },
-                      nav_button_next: {
-                        width: "32px",
-                        height: "32px",
-                      },
-                      caption: {
-                        textTransform: "capitalize",
-                      },
-                    }}
-                  />
-                </div>
-
-                {getOpeningHourByDay && (
-                  <div className="border-t border-secondary py-4">
-                    <h2 className="pl-3 text-xs uppercase text-gray-400 font-bold mb-3">
-                      Selecione um profissional
-                    </h2>
-                    <div
-                      className={cn(
-                        "flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden",
-                        establishment.employees.length <= 2 &&
-                          "items-center justify-center"
-                      )}
-                    >
-                      {establishment.employees.map(
-                        (employee: Employee, index: Key | null | undefined) => (
-                          <EmployeeItem
-                            employeeSelected={employeeSelected}
-                            setEmployeeSelected={changeEmployee}
-                            employee={employee}
-                            key={index}
-                          />
-                        )
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {employeeSelected && (
-                  <div className="border-t border-secondary py-4">
-                    <h2 className="pl-3 text-xs uppercase text-gray-400 font-bold mb-3">
-                      Selecione um horário
-                    </h2>
-                    <div className="flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-                      {!loadingEmployeeSelected && timeList.length ? (
-                        timeList.map((time, index) => (
-                          <Button
-                            onClick={() => setHour(time)}
-                            variant={hour === time ? "default" : "outline"}
-                            className="rounded-full"
-                            key={index}
-                          >
-                            {time}
-                          </Button>
-                        ))
-                      ) : (
-                        <p className="text-sm text-center font-semibold text-red-400">
-                          Não possui mais horários disponiveis para este dia.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <Sheet
-                  open={sheetConfirmIsOpen}
-                  onOpenChange={setSheetConfirmIsOpen}
-                >
-                  <SheetTrigger asChild>
+                  <div className="flex items-center mt-10">
                     <Button
-                      className="absolute bottom-5 left-0 right-0 w-[87%] mx-auto"
-                      disabled={!date || !hour || submitIsLoading}
+                      onClick={loginClick}
+                      className="mx-auto"
                     >
                       {submitIsLoading && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      Confirmar
+                      Fazer Login para continuar
                     </Button>
-                  </SheetTrigger>
+                  </div>
+                </SheetContent>
+              ) : (
+                <SheetContent className="p-0 w-10/12">
+                  <SheetHeader className="text-left px-5 py-2 border-b border-secondary">
+                    <SheetTitle>Fazer Reserva</SheetTitle>
+                  </SheetHeader>
 
-                  <SheetContent side="bottom">
-                    <div className="py-4 mt-2">
-                      <Card>
-                        <CardContent className="p-3 flex flex-col gap-3">
-                          <div className="flex items-center justify-between">
-                            <h2 className="font-bold">{service.name}</h2>
-                            <h3 className="font-bold text-sm">
-                              {Intl.NumberFormat("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
-                              }).format(Number(service.price))}
-                            </h3>
-                          </div>
+                  {/* React Day Picker Below */}
 
-                          {date && (
-                            <div className="flex justify-between text-sm">
-                              <h3 className="text-gray-400">Data</h3>
-                              <h4 className="text-gray-400">
-                                {format(date, "dd 'de' MMMM", {
-                                  locale: ptBR,
-                                })}
-                              </h4>
-                            </div>
-                          )}
+                  <div className="py-2">
+                    <Calendar
+                      showOutsideDays={false}
+                      className="w-full h-[50%]"
+                      mode="single"
+                      selected={date}
+                      onSelect={dateClick}
+                      locale={ptBR}
+                      fromDate={new Date()}
+                      styles={{
+                        head_cell: {
+                          width: "100%",
+                          textTransform: "capitalize",
+                        },
+                        cell: {
+                          width: "100%",
+                        },
+                        button: {
+                          width: "100%",
+                        },
+                        nav_button_previous: {
+                          width: "32px",
+                          height: "32px",
+                        },
+                        nav_button_next: {
+                          width: "32px",
+                          height: "32px",
+                        },
+                        caption: {
+                          textTransform: "capitalize",
+                        },
+                      }}
+                    />
+                  </div>
 
-                          {hour && (
-                            <div className="flex justify-between text-sm">
-                              <h3 className="text-gray-400">Horário</h3>
-                              <h4 className="text-gray-400">{hour}</h4>
-                            </div>
-                          )}
-
-                          <div className="flex justify-between text-sm">
-                            <h3 className="text-gray-400">Estabelecimento</h3>
-                            <h4 className="text-gray-400">
-                              {establishment.name}
-                            </h4>
-                          </div>
-
-                          {employeeSelected && (
-                            <div className="flex justify-between text-sm">
-                              <h3 className="text-gray-400">Profissional</h3>
-                              <h4 className="text-gray-400">
-                                {employeeSelected.name}
-                              </h4>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    <Button
-                      className="w-full"
-                      onClick={bookingSubmit}
-                      disabled={
-                        !date ||
-                        !hour ||
-                        submitIsLoading ||
-                        booking !== undefined
-                      }
-                    >
-                      {submitIsLoading && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      {booking ? "Reserva confirmada" : "Confirmar reserva"}
-                    </Button>
-
-                    {booking && (
-                      <SheetClose asChild>
-                        <Button
-                          className="w-full mt-3 bg-green-500 border-none"
-                          onClick={() => sendMessage()}
-                        >
-                          Confirmar via whatsapp
-                        </Button>
-                      </SheetClose>
-                    )}
-
-                    {booking && (
-                      <Button
-                        variant="secondary"
-                        className="w-full mt-3"
-                        onClick={() => router.push("/bookings")}
+                  {getOpeningHourByDay && (
+                    <div className="border-t border-secondary py-4">
+                      <h2 className="pl-3 text-xs uppercase text-gray-400 font-bold mb-3">
+                        Selecione um profissional
+                      </h2>
+                      <div
+                        className={cn(
+                          "flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden",
+                          establishment.employees.length <= 2 &&
+                            "items-center justify-center"
+                        )}
                       >
-                        Ver meus agendamentos
-                      </Button>
-                    )}
-                  </SheetContent>
-                </Sheet>
-              </SheetContent>
+                        {establishment.employees.map(
+                          (
+                            employee: Employee,
+                            index: Key | null | undefined
+                          ) => (
+                            <EmployeeItem
+                              employeeSelected={employeeSelected}
+                              setEmployeeSelected={changeEmployee}
+                              employee={employee}
+                              key={index}
+                            />
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {employeeSelected && (
+                    <div className="border-t border-secondary py-4">
+                      <h2 className="pl-3 text-xs uppercase text-gray-400 font-bold mb-3">
+                        Selecione um horário
+                      </h2>
+                      <div className="flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                        {!loadingEmployeeSelected && timeList.length ? (
+                          timeList.map((time, index) => (
+                            <Button
+                              onClick={() => setHour(time)}
+                              variant={hour === time ? "default" : "outline"}
+                              className="rounded-full"
+                              key={index}
+                            >
+                              {time}
+                            </Button>
+                          ))
+                        ) : (
+                          <p className="text-sm text-center font-semibold text-red-400">
+                            Não possui mais horários disponiveis para este dia.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {!isAuthenticated && (
+                    <Sheet
+                      open={sheetConfirmIsOpen}
+                      onOpenChange={setSheetConfirmIsOpen}
+                    >
+                      <SheetTrigger asChild>
+                        <Button
+                          className="absolute bottom-5 left-0 right-0 w-[87%] mx-auto"
+                          disabled={
+                            !date ||
+                            !hour ||
+                            submitIsLoading ||
+                            !isAuthenticated
+                          }
+                        >
+                          {submitIsLoading && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          )}
+                          Confirmar
+                        </Button>
+                      </SheetTrigger>
+
+                      <SheetContent side="bottom">
+                        <div className="py-4 mt-2">
+                          <Card>
+                            <CardContent className="p-3 flex flex-col gap-3">
+                              <div className="flex items-center justify-between">
+                                <h2 className="font-bold">{service.name}</h2>
+                                <h3 className="font-bold text-sm">
+                                  {Intl.NumberFormat("pt-BR", {
+                                    style: "currency",
+                                    currency: "BRL",
+                                  }).format(Number(service.price))}
+                                </h3>
+                              </div>
+
+                              {date && (
+                                <div className="flex justify-between text-sm">
+                                  <h3 className="text-gray-400">Data</h3>
+                                  <h4 className="text-gray-400">
+                                    {format(date, "dd 'de' MMMM", {
+                                      locale: ptBR,
+                                    })}
+                                  </h4>
+                                </div>
+                              )}
+
+                              {hour && (
+                                <div className="flex justify-between text-sm">
+                                  <h3 className="text-gray-400">Horário</h3>
+                                  <h4 className="text-gray-400">{hour}</h4>
+                                </div>
+                              )}
+
+                              <div className="flex justify-between text-sm">
+                                <h3 className="text-gray-400">
+                                  Estabelecimento
+                                </h3>
+                                <h4 className="text-gray-400">
+                                  {establishment.name}
+                                </h4>
+                              </div>
+
+                              {employeeSelected && (
+                                <div className="flex justify-between text-sm">
+                                  <h3 className="text-gray-400">
+                                    Profissional
+                                  </h3>
+                                  <h4 className="text-gray-400">
+                                    {employeeSelected.name}
+                                  </h4>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        <Button
+                          className="w-full"
+                          onClick={bookingSubmit}
+                          disabled={
+                            !date ||
+                            !hour ||
+                            submitIsLoading ||
+                            booking !== undefined
+                          }
+                        >
+                          {submitIsLoading && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          )}
+                          {booking ? "Reserva confirmada" : "Confirmar reserva"}
+                        </Button>
+
+                        {booking && (
+                          <SheetClose asChild>
+                            <Button
+                              className="w-full mt-3 bg-green-500 border-none"
+                              onClick={() => sendMessage()}
+                            >
+                              Confirmar via whatsapp
+                            </Button>
+                          </SheetClose>
+                        )}
+
+                        {booking && (
+                          <Button
+                            variant="secondary"
+                            className="w-full mt-3"
+                            onClick={() => router.push("/bookings")}
+                          >
+                            Ver meus agendamentos
+                          </Button>
+                        )}
+                      </SheetContent>
+                    </Sheet>
+                  )}
+                </SheetContent>
+              )}
             </Sheet>
           </div>
         </div>
