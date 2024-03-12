@@ -86,15 +86,38 @@ const SideMenu = () => {
             <h2 className="font-bold">{data.user.name}</h2>
           </div>
 
-          <Button variant="secondary" size="icon">
-            <LogOutIcon onClick={logoutClick} />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger className="cursor-pointer" asChild>
+              <LogOutIcon size={20} />
+            </AlertDialogTrigger>
+
+            <AlertDialogContent className="w-[90%] rounded-lg">
+              <AlertDialogHeader className="flex items-center">
+                <AlertDialogTitle>Sair da conta</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Tem certeza que deseja sair da conta?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <AlertDialogFooter className="flex-row gap-3">
+                <AlertDialogCancel className="w-full mt-0">
+                  Voltar
+                </AlertDialogCancel>
+
+                <AlertDialogAction className="w-full" onClick={logoutClick}>
+                  {isDeleteLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Confirmar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       ) : (
         !admin && (
           <div className="flex flex-col px-5 pt-6 gap-3">
             <div className="flex items-center gap-2">
-              <UserIcon size={25} />
               <h2 className="font-bold">Olá, faça seu login!</h2>
             </div>
             <Button
@@ -102,7 +125,7 @@ const SideMenu = () => {
               className="w-full justify-start mt-2"
               onClick={loginClick}
             >
-              <LogInIcon className="mr-2" size={18} />
+              <UserIcon className="mr-2" size={18} />
               Fazer Login
             </Button>
           </div>
