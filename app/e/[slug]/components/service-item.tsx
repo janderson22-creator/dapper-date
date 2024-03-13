@@ -292,12 +292,12 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
               </SheetTrigger>
 
               {!isAuthenticated ? (
-                <SheetContent side="bottom" className="p-0 pb-10 lg:rounded-lg rounded-t-lg w-full lg:w-10/12 lg:left-0 lg:right-0 lg:top-0 lg:bottom-0 lg:m-auto h-fit">
+                <SheetContent side="bottom" className="p-0 pb-10 lg:rounded-lg rounded-t-lg w-full lg:w-fit lg:left-0 lg:right-0 lg:top-0 lg:bottom-0 lg:m-auto h-fit">
                   <SheetHeader className="text-left px-5 py-2 border-b border-secondary">
                     <SheetTitle>Fazer Reserva</SheetTitle>
                   </SheetHeader>
 
-                  <div className="flex items-center mt-10">
+                  <div className="flex items-center lg:items-start lg:px-20 mt-10">
                     <Button
                       onClick={loginClick}
                       className="mx-auto"

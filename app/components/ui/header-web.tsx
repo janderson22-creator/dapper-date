@@ -66,7 +66,7 @@ const HeaderWeb = () => {
   };
 
   return (
-    <Card className="hidden lg:flex rounded-none">
+    <Card className="hidden lg:block rounded-none">
       <CardContent className="max-w-[1280px] m-auto p-5 pr-10 flex items-center justify-between">
         <Link href={"/"}>
           <Image src="/logo.png" alt="dapper date" height={22} width={120} />
