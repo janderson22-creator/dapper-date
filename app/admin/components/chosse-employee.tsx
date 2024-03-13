@@ -130,7 +130,10 @@ const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({
                 </Button>
               </SheetTrigger>
 
-              <SheetContent className="p-0" side="bottom">
+              <SheetContent
+                className="p-0 lg:left-0 lg:right-0 lg:top-0 lg:bottom-0 lg:m-auto lg:w-4/12 lg:rounded-lg lg:h-fit"
+                side="bottom"
+              >
                 <SheetHeader className="text-left px-5 py-2 border-b border-secondary">
                   <SheetTitle>Selecione um dia</SheetTitle>
                 </SheetHeader>
