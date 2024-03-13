@@ -11,6 +11,7 @@ interface AdminPageProps {
 }
 
 const AdminPage: React.FC<AdminPageProps> = async ({ params }) => {
+  
   const bookings: Booking = await db.booking.findMany({
     where: {
       establishmentId: params.id,

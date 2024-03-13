@@ -25,7 +25,7 @@ import { Key, useCallback, useEffect, useMemo, useState } from "react";
 import { generateDayTimeList } from "../helpers/hours";
 import { format, setHours, setMinutes } from "date-fns";
 import { saveBooking } from "../actions/save-booking";
-import { Loader2 } from "lucide-react";
+import { ArrowDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { getDayBookings } from "../actions/get-day-bookings";
@@ -54,6 +54,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   >();
   const [submitIsLoading, setSubmitIsLoading] = useState(false);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
+  const [sheetDateIsOpen, setSheetDateIsOpen] = useState(false);
   const [sheetConfirmIsOpen, setSheetConfirmIsOpen] = useState(false);
   const [dayBookings, setDayBookings] = useState<Booking>([]);
   const [booking, setBooking] = useState<Date | undefined>();
@@ -116,6 +117,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     setDate(date);
     setHour(undefined);
     setEmployeeSelected(undefined);
+    setSheetDateIsOpen(false);
   };
 
   const loginClick = () => {
@@ -292,16 +294,16 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
               </SheetTrigger>
 
               {!isAuthenticated ? (
-                <SheetContent side="bottom" className="p-0 pb-10 lg:rounded-lg rounded-t-lg w-full lg:w-fit lg:left-0 lg:right-0 lg:top-0 lg:bottom-0 lg:m-auto h-fit">
+                <SheetContent
+                  side="bottom"
+                  className="p-0 pb-10 lg:rounded-lg rounded-t-lg w-full lg:w-fit lg:left-0 lg:right-0 lg:top-0 lg:bottom-0 lg:m-auto h-fit"
+                >
                   <SheetHeader className="text-left px-5 py-2 border-b border-secondary">
                     <SheetTitle>Fazer Reserva</SheetTitle>
                   </SheetHeader>
 
                   <div className="flex items-center lg:items-start lg:px-20 mt-10">
-                    <Button
-                      onClick={loginClick}
-                      className="mx-auto"
-                    >
+                    <Button onClick={loginClick} className="mx-auto">
                       {submitIsLoading && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
@@ -317,40 +319,82 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
 
                   {/* React Day Picker Below */}
 
-                  <div className="py-2">
-                    <Calendar
-                      showOutsideDays={false}
-                      className="w-full h-[50%]"
-                      mode="single"
-                      selected={date}
-                      onSelect={dateClick}
-                      locale={ptBR}
-                      fromDate={new Date()}
-                      styles={{
-                        head_cell: {
-                          width: "100%",
-                          textTransform: "capitalize",
-                        },
-                        cell: {
-                          width: "100%",
-                        },
-                        button: {
-                          width: "100%",
-                        },
-                        nav_button_previous: {
-                          width: "32px",
-                          height: "32px",
-                        },
-                        nav_button_next: {
-                          width: "32px",
-                          height: "32px",
-                        },
-                        caption: {
-                          textTransform: "capitalize",
-                        },
-                      }}
-                    />
-                  </div>
+                  <h2 className="text-xs uppercase text-gray-400 font-bold mt-4 mb-2 pl-4">
+                    Data
+                  </h2>
+                  <Sheet
+                    open={sheetDateIsOpen}
+                    onOpenChange={setSheetDateIsOpen}
+                  >
+                    <div className="px-10">
+                      <SheetTrigger asChild>
+                        <Button
+                          variant="secondary"
+                          className="w-full font-bold text-3x1 mb-5 tracking-widest flex items-center"
+                        >
+                          <p className="ml-auto">
+                            {date
+                              ? format(date, "dd/MM/yyyy")
+                              : "Selecione uma data"}
+                          </p>
+                          <ArrowDown size={18} className="ml-auto" />
+                        </Button>
+                      </SheetTrigger>
+                    </div>
+
+                    <SheetContent
+                      className="p-0 lg:left-0 lg:right-0 lg:top-0 lg:bottom-0 lg:m-auto lg:w-4/12 lg:rounded-lg lg:h-fit"
+                      side="bottom"
+                    >
+                      <SheetHeader className="text-left px-5 py-2 border-b border-secondary">
+                        <SheetTitle>Selecione um dia</SheetTitle>
+                      </SheetHeader>
+
+                      {/* React Day Picker Below */}
+
+                      <div className="py-2">
+                        <Calendar
+                          showOutsideDays={false}
+                          className="w-full h-[50%]"
+                          mode="single"
+                          selected={date}
+                          onSelect={dateClick}
+                          locale={ptBR}
+                          fromDate={new Date()}
+                          styles={{
+                            head_cell: {
+                              width: "100%",
+                              textTransform: "capitalize",
+                            },
+                            cell: {
+                              width: "100%",
+                            },
+                            button: {
+                              width: "100%",
+                            },
+                            nav_button_previous: {
+                              width: "32px",
+                              height: "32px",
+                            },
+                            nav_button_next: {
+                              width: "32px",
+                              height: "32px",
+                            },
+                            caption: {
+                              textTransform: "capitalize",
+                            },
+                          }}
+                        />
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+
+                  {date && !getOpeningHourByDay && (
+                    <div className="text-center font-semibold px-4">
+                      O estabelecimento {establishment.name} não funciona{" "}
+                      {getDayOfWeek(date)}!
+                    </div>
+                  )}
 
                   {getOpeningHourByDay && (
                     <div className="border-t border-secondary py-4">
@@ -407,7 +451,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                     </div>
                   )}
 
-                  {!isAuthenticated && (
+                  {isAuthenticated && (
                     <Sheet
                       open={sheetConfirmIsOpen}
                       onOpenChange={setSheetConfirmIsOpen}
