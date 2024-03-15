@@ -263,6 +263,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     setBooking(undefined);
     setHour(undefined);
     setDate(undefined);
+    setEmployeeSelected(undefined)
   }, [sheetConfirmIsOpen]);
 
   return (

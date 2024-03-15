@@ -25,6 +25,8 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
   const [endTime, setEndTime] = useState("");
   const [pauseAt, setPauseAt] = useState("");
   const [backAt, setBackAt] = useState("");
+  const [sheetIsOpen, setSheetIsOpen] = useState(false);
+
   const copyPhoneNumber = () => {
     navigator.clipboard.writeText(establishment.phoneNumber);
 
@@ -41,6 +43,18 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
         return toast.error("Horário final do expediente não preenchido");
       }
 
+      if (startTime && endTime && pauseAt && !backAt) {
+        return toast.error("Horário de retorno do intervalo não preenchido");
+      }
+
+      if (startTime > endTime) {
+        return toast.error("Horário final antes do inicial");
+      }
+
+      if (pauseAt > backAt) {
+        return toast.error("Horário final de intervalo antes do inicial");
+      }
+
       try {
         await updateOpeningHours({
           id,
@@ -54,6 +68,8 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
           duration: 4000,
           position: "top-center",
         });
+
+        setSheetIsOpen(false);
       } catch (error) {
         console.error(error);
       }
@@ -107,7 +123,7 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
         <p className="text-gray-400 font-bold uppercase">HORÁRIOS</p>
         {sortedOpeningHours.map(
           (item: OpeningHour, key: Key | null | undefined) => (
-            <Sheet key={key}>
+            <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen} key={key}>
               <SheetTrigger
                 onClick={() => {
                   setStartTime(item.startTime);
@@ -117,16 +133,10 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
                 }}
                 asChild
               >
-                <div className="text-sm flex items-center justify-between px-2 py-2.5 my-2.5 last-of-type:mb-0 border rounded-lg">
+                <div className="text-sm flex items-center justify-between px-2 py-2.5 my-2.5 last-of-type:mb-0 border rounded-lg cursor-pointer">
                   <p className="capitalize text-gray-400">{item.dayOfWeek}</p>
 
                   <div className="flex">
-                    {/* <p>
-                  {item.startTime
-                    ? `${item.startTime} - ${item.endTime}`
-                    : "Fechado"}
-                </p> */}
-
                     <Switch checked={item.startTime ? true : false} />
                     <div className="flex items-center pl-2">
                       <ArrowDown size={20} />
@@ -135,7 +145,10 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
                 </div>
               </SheetTrigger>
 
-              <SheetContent side="bottom">
+              <SheetContent
+                side="bottom"
+                className="lg:bottom-0 lg:top-0 lg:left-0 lg:right-0 lg:h-fit lg:m-auto lg:rounded-lg lg:w-4/12"
+              >
                 <div className="flex flex-col gap-2">
                   <p className="text-center text-sm font-bold">
                     Expediente de {item.dayOfWeek}
@@ -175,15 +188,13 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
                   </div>
                 </div>
 
-                <SheetClose asChild>
-                  <Button
-                    disabled={disabledButton}
-                    onClick={() => submitClick(item.id, false)}
-                    className="w-full mt-5"
-                  >
-                    Confirmar horário
-                  </Button>
-                </SheetClose>
+                <Button
+                  disabled={disabledButton}
+                  onClick={() => submitClick(item.id, false)}
+                  className="w-full mt-5"
+                >
+                  Confirmar horário
+                </Button>
 
                 <div className="mt-10">
                   <p className="text-xs mb-2 text-gray-400">

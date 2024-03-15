@@ -9,31 +9,27 @@ export function generateDayTimeList(
   const isCurrentDay = isToday(date);
 
   let startTime;
+
   if (isCurrentDay) {
     const currentHour = today.getHours();
     const currentMinute = today.getMinutes();
-    let nextHour = currentHour;
-    let nextMinute = currentMinute;
-
-    // Calculating the next time slot
-    if (currentMinute >= 45) {
-      nextHour += 1;
-      nextMinute = 30; // Next slot starts at 30 minutes past the hour
-    } else if (currentMinute >= 30) {
-      nextMinute = 45;
-    } else if (currentMinute >= 15) {
-      nextMinute = 45;
+    
+    // Se o horário atual for maior ou igual ao startAt, então o próximo slot é 45 minutos após o horário atual.
+    if (currentHour > startAt || (currentHour === startAt && currentMinute >= 45)) {
+      startTime = setMinutes(setHours(today, currentHour), 45);
+    } else if (currentHour === startAt && currentMinute >= 30) {
+      startTime = setMinutes(setHours(today, currentHour), 30);
+    } else if (currentHour === startAt && currentMinute >= 15) {
+      startTime = setMinutes(setHours(today, currentHour), 15);
     } else {
-      nextMinute = 45;
+      startTime = setMinutes(setHours(today, startAt), 0);
     }
-
-    startTime = setMinutes(setHours(today, nextHour), nextMinute);
   } else {
-    startTime = setMinutes(setHours(date, startAt), 0); // Set end time to start time of establishment
+    startTime = setMinutes(setHours(date, startAt), 0);
   }
 
-  const endTime = setMinutes(setHours(date, endAt), 0); // Set end time to end time of establishment
-  const interval = 45; // interval in minutes
+  const endTime = setMinutes(setHours(date, endAt), 0);
+  const interval = 45;
   const timeList: string[] = [];
 
   let currentTime = startTime;

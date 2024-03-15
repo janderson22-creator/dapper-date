@@ -1,6 +1,6 @@
 "use client";
 
-import { Establishment, Service } from "@prisma/client";
+import { Admin, Establishment, Service } from "@prisma/client";
 import EstablishmentHeader from "./components/establishment-header";
 import Services from "./components/services";
 import { useCallback, useEffect, useState } from "react";
@@ -22,6 +22,20 @@ const EstablishmentDetailsPage: React.FC<EstablishmentDetailsPageProps> = ({
   const [currentEstablishment, setCurrentEstablishment] =
     useState<Establishment>();
   const [hasUser, setHasUser] = useState<boolean>();
+  
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const adminJson = localStorage.getItem("admin");
+
+      if (!adminJson) return;
+
+      const admin: Admin = JSON.parse(adminJson);
+      if (admin) {
+        route.push(`/admin/${admin.establishmentId}`);
+        return;
+      }
+    }
+  }, [route]);
 
   const fetchEstablishment = useCallback(async () => {
     if (!params.slug) return null;
