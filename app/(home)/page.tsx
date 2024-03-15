@@ -82,7 +82,7 @@ export default async function Home() {
         </div>
 
         <div className="mt-6 lg:mt-8">
-          <h2 className="px-5 text-xs lg:text-lg uppercase text-gray-400 font-bold mb-3 lg:mb-5">
+          <h2 className="px-3 text-xs lg:text-lg uppercase text-gray-400 font-bold mb-3 lg:mb-5">
             Recomendados
           </h2>
 

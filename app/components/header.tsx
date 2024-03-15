@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
@@ -5,8 +7,27 @@ import { MenuIcon } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import SideMenu from "./side-menu";
 import Link from "next/link";
+import { useEffect } from "react";
+import { Admin } from "@prisma/client";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const adminJson = localStorage.getItem("admin");
+
+      if (!adminJson) return;
+
+      const admin: Admin = JSON.parse(adminJson);
+      if (admin) {
+        router.push(`/admin/${admin.establishmentId}`);
+        return;
+      }
+    }
+  }, [router]);
+
   return (
     <Card className="rounded-none lg:hidden">
       <CardContent className="p-5 flex items-center justify-between">

@@ -48,10 +48,13 @@ const HeaderWeb = () => {
       if (!adminJson) return;
 
       const admin: Admin = JSON.parse(adminJson);
-
-      setAdmin(admin);
+      if (admin) {
+        router.push(`/admin/${admin.establishmentId}`);
+        setAdmin(admin);
+        return;
+      }
     }
-  }, []);
+  }, [router]);
 
   const logout = async () => {
     setIsDeleteLoading(true);

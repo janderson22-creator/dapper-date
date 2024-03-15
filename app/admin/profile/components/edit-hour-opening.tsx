@@ -79,7 +79,7 @@ const EditHourOpening: React.FC<EditHourOpeningProps> = ({
   }, [endTime, label, pauseAt, startTime]);
 
   return (
-    <div className="w-full" ref={ref}>
+    <div className="w-full cursor-pointer" ref={ref}>
       <label className="text-xs text-gray-400" htmlFor="startAt">
         {label} ás:
       </label>
