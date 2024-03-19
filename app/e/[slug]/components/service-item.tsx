@@ -263,7 +263,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     setBooking(undefined);
     setHour(undefined);
     setDate(undefined);
-    setEmployeeSelected(undefined)
+    setEmployeeSelected(undefined);
   }, [sheetConfirmIsOpen]);
 
   return (
@@ -404,7 +404,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                       </h2>
                       <div
                         className={cn(
-                          "flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden",
+                          "flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden lg:[&::-webkit-scrollbar]:block lg:pb-4",
                           establishment.employees.length <= 2 &&
                             "items-center justify-center"
                         )}
@@ -431,7 +431,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                       <h2 className="pl-3 text-xs uppercase text-gray-400 font-bold mb-3">
                         Selecione um horário
                       </h2>
-                      <div className="flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                      <div className="flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden lg:[&::-webkit-scrollbar]:block lg:pb-4">
                         {!loadingEmployeeSelected && timeList.length ? (
                           timeList.map((time, index) => (
                             <Button
@@ -474,7 +474,10 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                         </Button>
                       </SheetTrigger>
 
-                      <SheetContent side="bottom">
+                      <SheetContent
+                        side="bottom"
+                        className="lg:bottom-0 lg:top-0 lg:left-0 lg:right-0 lg:w-4/12 lg:h-fit lg:m-auto lg:rounded-lg"
+                      >
                         <div className="py-4 mt-2">
                           <Card>
                             <CardContent className="p-3 flex flex-col gap-3">

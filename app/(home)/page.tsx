@@ -70,7 +70,7 @@ export default async function Home() {
                 Agendamentos
               </h2>
 
-              <div className="px-3 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+              <div className="px-3 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden lg:[&::-webkit-scrollbar]:block lg:pb-4 scrollbar-modify">
                 {confirmedBookings.map(
                   (booking: Booking, index: Key | null | undefined) => (
                     <BookingItem booking={booking} key={index} />
