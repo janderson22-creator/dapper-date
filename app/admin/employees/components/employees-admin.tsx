@@ -183,7 +183,7 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
             </h2>
 
             <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
-              <SheetTrigger asChild>
+              <SheetTrigger className="cursor-pointer" asChild>
                 <PlusCircle />
               </SheetTrigger>
 
@@ -293,7 +293,7 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
               <div
                 onClick={() => editEmployee(employee)}
                 key={index}
-                className="flex items-center rounded-2xl bg-transparent py-3 relative"
+                className="flex items-center rounded-2xl bg-transparent py-3 relative cursor-pointer lg:hover:bg-gray-800 transition-all ease-in duration-100 hover:rounded-none"
               >
                 <div className="w-[10%] pl-3 text-gray-400 text-sm font-bold">
                   {index + 1}

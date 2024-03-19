@@ -186,7 +186,7 @@ const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({
                       onClick={() => setEmployeeSelected(employee.id)}
                       key={index}
                       className={cn(
-                        "min-w-[180px] max-w-[180px] max-h-[280px] rounded-2xl",
+                        "min-w-[180px] max-w-[180px] max-h-[280px] rounded-2xl cursor-pointer",
                         employee.id === employeeSelected && "bg-primary"
                       )}
                     >
