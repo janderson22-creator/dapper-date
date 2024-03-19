@@ -43,7 +43,9 @@
 
 ::-webkit-scrollbar {
   width: 5px;
+  height: 10px;
   background: #ffffff;
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {

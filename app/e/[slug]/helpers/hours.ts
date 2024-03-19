@@ -24,6 +24,7 @@ export function generateDayTimeList(
     } else {
       startTime = setMinutes(setHours(today, startAt), 0);
     }
+    
   } else {
     startTime = setMinutes(setHours(date, startAt), 0);
   }

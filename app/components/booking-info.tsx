@@ -39,6 +39,8 @@ interface BookingInfoProps {
 
 const BookingInfo: React.FC<BookingInfoProps> = ({ booking }) => {
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [sheetConfirmIsOpen, setSheetConfirmIsOpen] = useState(false);
+  const [bookingCanceled, setBookingCanceled] = useState(false);
 
   const cancelClick = async () => {
     setIsDeleteLoading(true);
@@ -47,27 +49,33 @@ const BookingInfo: React.FC<BookingInfoProps> = ({ booking }) => {
       await cancelBooking(booking.id);
 
       toast.success("Reserva cancelada com sucesso!");
-
-      setTimeout(async () => {
-        const message = `Óla, sou ${
-          booking.user?.name
-        }, estou cancelando a reserva para ${
-          booking.employee?.name
-        }, peço desculpas pois tive um imprevisto ${format(
-          booking.date,
-          "'no dia' dd 'de' MMMM 'ás' HH:mm",
-          {
-            locale: ptBR,
-          }
-        )}.`;
-        const whatsappNumber = booking.establishment?.phoneNumber;
-        await sendWhatsAppMessage(whatsappNumber, message);
-      }, 3000);
+      setBookingCanceled(true);
     } catch (error) {
       console.error(error);
     } finally {
       setIsDeleteLoading(false);
     }
+  };
+
+  const sendMessage = () => {
+    if (!booking) return;
+
+    const message = `Óla, sou ${
+      booking.user?.name
+    }, estou cancelando a reserva para ${
+      booking.employee?.name
+    }, peço desculpas pois tive um imprevisto ${format(
+      booking.date,
+      "'no dia' dd 'de' MMMM 'ás' HH:mm",
+      {
+        locale: ptBR,
+      }
+    )}.`;
+    const whatsappNumber = booking.establishment?.phoneNumber;
+    sendWhatsAppMessage(whatsappNumber, message);
+
+    setSheetConfirmIsOpen(false);
+    setBookingCanceled(false);
   };
 
   return (
@@ -160,16 +168,24 @@ const BookingInfo: React.FC<BookingInfoProps> = ({ booking }) => {
             </Button>
           </SheetClose>
 
-          <AlertDialog>
+          <AlertDialog
+            open={sheetConfirmIsOpen}
+            onOpenChange={setSheetConfirmIsOpen}
+          >
             <AlertDialogTrigger asChild>
               <Button
-                disabled={isPast(booking.date) || isDeleteLoading}
+                disabled={
+                  isPast(booking.date) || isDeleteLoading || bookingCanceled
+                }
                 className="w-full"
                 variant="destructive"
               >
-                Cancelar Reserva
+                {bookingCanceled
+                  ? "Reserva cancelada com sucesso!"
+                  : "Cancelar Reserva"}
               </Button>
             </AlertDialogTrigger>
+
             <AlertDialogContent className="w-[90%] rounded-lg">
               <AlertDialogHeader>
                 <AlertDialogTitle>Cancelar reserva?</AlertDialogTitle>
@@ -182,22 +198,33 @@ const BookingInfo: React.FC<BookingInfoProps> = ({ booking }) => {
                   Voltar
                 </AlertDialogCancel>
 
-                <SheetClose asChild>
-                  <AlertDialogAction
-                    disabled={isPast(booking.date) || isDeleteLoading}
-                    className="w-full"
-                    onClick={cancelClick}
-                  >
-                    {isDeleteLoading && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Confirmar
-                  </AlertDialogAction>
-                </SheetClose>
+                <AlertDialogAction
+                  disabled={
+                    isPast(booking.date) || isDeleteLoading || bookingCanceled
+                  }
+                  className="w-full"
+                  onClick={cancelClick}
+                >
+                  {isDeleteLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Confirmar
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </SheetFooter>
+        
+        {bookingCanceled && (
+          <SheetClose asChild>
+            <Button
+              className="w-full mt-3 bg-green-500 border-none"
+              onClick={() => sendMessage()}
+            >
+              Confirmar via whatsapp
+            </Button>
+          </SheetClose>
+        )}
       </div>
     </SheetContent>
   );
