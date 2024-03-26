@@ -32,12 +32,14 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import sendWhatsAppMessage from "../e/[slug]/helpers/send-message-whatsapp";
+import { useSession } from "next-auth/react";
 
 interface BookingInfoProps {
   booking: Booking;
 }
 
 const BookingInfo: React.FC<BookingInfoProps> = ({ booking }) => {
+  const { data } = useSession();
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [sheetConfirmIsOpen, setSheetConfirmIsOpen] = useState(false);
   const [bookingCanceled, setBookingCanceled] = useState(false);
@@ -61,7 +63,7 @@ const BookingInfo: React.FC<BookingInfoProps> = ({ booking }) => {
     if (!booking) return;
 
     const message = `Óla, sou ${
-      booking.user?.name
+      data?.user?.name
     }, estou cancelando a reserva para ${
       booking.employee?.name
     }, peço desculpas pois tive um imprevisto ${format(
