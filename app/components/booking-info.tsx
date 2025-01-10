@@ -129,12 +129,7 @@ const BookingInfo: React.FC<BookingInfoProps> = ({ booking }) => {
           <CardContent className="p-3 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h2 className="font-bold">{booking.service.name}</h2>
-              <h3 className="font-bold text-sm">
-                {Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(Number(booking.service.price))}
-              </h3>
+              <h3 className="font-bold text-sm">R$ {booking.service.price}</h3>
             </div>
 
             <div className="flex justify-between text-sm">
@@ -216,7 +211,7 @@ const BookingInfo: React.FC<BookingInfoProps> = ({ booking }) => {
             </AlertDialogContent>
           </AlertDialog>
         </SheetFooter>
-        
+
         {bookingCanceled && (
           <SheetClose asChild>
             <Button

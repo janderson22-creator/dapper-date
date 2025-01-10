@@ -309,10 +309,7 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
 
                     <div className="flex items-center justify-between mt-2">
                       <p className="text-sm text-primary font-bold">
-                        {Intl.NumberFormat("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        }).format(Number(service.price))}
+                        R$ {service.price}
                       </p>
                     </div>
                   </div>

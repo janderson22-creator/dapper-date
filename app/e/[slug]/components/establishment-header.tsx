@@ -4,13 +4,7 @@ import SideMenu from "@/app/components/side-menu";
 import { Button } from "@/app/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/app/components/ui/sheet";
 import { Establishment } from "@prisma/client";
-import {
-  ChevronLeftIcon,
-  MapPinIcon,
-  MenuIcon,
-  Pencil,
-  StarIcon,
-} from "lucide-react";
+import { ChevronLeftIcon, MapPinIcon, MenuIcon, Pencil } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 

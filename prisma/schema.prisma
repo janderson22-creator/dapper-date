@@ -9,6 +9,7 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -19,59 +20,63 @@ model User {
   sessions      Session[]
   bookings      Booking[]
 }
+
 model Establishment {
-  id          String          @id @default(uuid())
-  name        String
-  address     String
-  imageUrl    String
-  description String
-  phoneNumber String
-  slug String @unique
-  admin       Admin?
-  services    Service[]
-  bookings    Booking[]
+  id           String        @id @default(uuid())
+  name         String
+  address      String
+  imageUrl     String
+  description  String
+  phoneNumber  String
+  slug         String        @unique
+  admin        Admin?
+  services     Service[]
+  bookings     Booking[]
   openingHours OpeningHour[]
-  employees Employee[]
+  employees    Employee[]
 }
+
 model Admin {
-  id               String        @id @default(uuid())
-  email            String        @unique
-  password         String
-  establishmentId  String        @unique
-  establishment    Establishment @relation(fields: [establishmentId], references: [id])
+  id              String        @id @default(uuid())
+  email           String        @unique
+  password        String
+  establishmentId String        @unique
+  establishment   Establishment @relation(fields: [establishmentId], references: [id])
 }
 
 model Employee {
-  id   String   @id @default(uuid())
-  imageUrl    String
-  name        String
-  position    String
+  id       String @id @default(uuid())
+  imageUrl String
+  name     String
+  position String
 
   establishmentId String
   establishment   Establishment @relation(fields: [establishmentId], references: [id])
-  bookings    Booking[]
+  bookings        Booking[]
 }
+
 model OpeningHour {
-  id              String      @id @default(uuid())
+  id              String        @id @default(uuid())
   establishmentId String
   establishment   Establishment @relation(fields: [establishmentId], references: [id])
   dayOfWeek       String
-  startTime       String 
+  startTime       String
   endTime         String
   pauseAt         String?
-  backAt          String? 
+  backAt          String?
 }
 
 model Service {
   id              String        @id @default(uuid())
   name            String
-  price           Decimal       @db.Decimal(10, 2)
+  price           Float
   description     String
-  imageUrl String
+  imageUrl        String
   establishmentId String
   establishment   Establishment @relation(fields: [establishmentId], references: [id])
   booking         Booking[]
 }
+
 model Booking {
   id   String   @id @default(uuid())
   date DateTime
@@ -88,6 +93,7 @@ model Booking {
   employeeId String
   employee   Employee @relation(fields: [employeeId], references: [id])
 }
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -106,6 +112,7 @@ model Account {
 
   @@unique([provider, providerAccountId])
 }
+
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -113,6 +120,7 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
 model VerificationToken {
   identifier String
   token      String   @unique

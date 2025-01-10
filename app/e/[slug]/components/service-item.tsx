@@ -283,12 +283,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
           <p className="text-sm text-gray-400">{service.description}</p>
 
           <div className="flex items-center justify-between mt-2">
-            <p className="text-sm text-primary font-bold">
-              {Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              }).format(Number(service.price))}
-            </p>
+            <p className="text-sm text-primary font-bold">R$ {service.price}</p>
             <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="secondary">Reservar</Button>
@@ -484,10 +479,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                               <div className="flex items-center justify-between">
                                 <h2 className="font-bold">{service.name}</h2>
                                 <h3 className="font-bold text-sm">
-                                  {Intl.NumberFormat("pt-BR", {
-                                    style: "currency",
-                                    currency: "BRL",
-                                  }).format(Number(service.price))}
+                                  R$ {service.price}
                                 </h3>
                               </div>
 

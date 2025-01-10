@@ -3,7 +3,7 @@
 import { Button } from "@/app/components/ui/button";
 import { Establishment, OpeningHour } from "@prisma/client";
 import { Smartphone } from "lucide-react";
-import { Key, useState } from "react";
+import { Key } from "react";
 import { toast } from "sonner";
 
 interface Props {
