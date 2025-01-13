@@ -3,7 +3,7 @@ import { AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { Badge } from "@/app/components/ui/badge";
 import { Card, CardContent } from "@/app/components/ui/card";
 import { Sheet, SheetTrigger } from "@/app/components/ui/sheet";
-import { cn } from "@/app/lib/utils";
+import { cn } from "@/app/utils/cn";
 import { Booking } from "@prisma/client";
 import { Avatar } from "@radix-ui/react-avatar";
 import { format, isPast } from "date-fns";

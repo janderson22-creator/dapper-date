@@ -6,8 +6,9 @@ import { Key, useCallback, useEffect, useState } from "react";
 import { Booking } from "@prisma/client";
 import { CalendarX2 } from "lucide-react";
 import { getBookings } from "../actions/get-bookings";
-import LoadingBookings from "./components/loading";
+import LoadingBookings from "./loading";
 import HeaderWeb from "../components/ui/header-web";
+import { organizeListByDate } from "../utils/organizeListByDate";
 
 const BookingsPage = () => {
   const [loading, setLoading] = useState(false);
@@ -31,20 +32,6 @@ const BookingsPage = () => {
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
-
-  confirmedBookings?.sort(
-    (
-      a: { date: string | number | Date },
-      b: { date: string | number | Date }
-    ) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
-
-  finishedBookings?.sort(
-    (
-      a: { date: string | number | Date },
-      b: { date: string | number | Date }
-    ) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
 
   return (
     <>
@@ -79,7 +66,7 @@ const BookingsPage = () => {
                     Confirmados
                   </h2>
                   <div className="flex flex-col lg:flex-row lg:flex-wrap lg:justify-between gap-y-3">
-                    {confirmedBookings.map(
+                    {organizeListByDate(confirmedBookings).map(
                       (booking: Booking, index: Key | null | undefined) => (
                         <BookingItem booking={booking} key={index} />
                       )
@@ -94,7 +81,7 @@ const BookingsPage = () => {
                     Finalizados
                   </h2>
                   <div className="flex flex-col lg:flex-row lg:flex-wrap lg:justify-between gap-y-3">
-                    {finishedBookings.map(
+                    {organizeListByDate(finishedBookings).map(
                       (booking: Booking, index: Key | null | undefined) => (
                         <BookingItem booking={booking} key={index} />
                       )

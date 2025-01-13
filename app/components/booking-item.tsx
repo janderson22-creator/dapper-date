@@ -6,11 +6,8 @@ import { Badge } from "./ui/badge";
 import { Card, CardContent } from "./ui/card";
 import { format, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { cn } from "../lib/utils";
-import {
-  Sheet,
-  SheetTrigger,
-} from "./ui/sheet";
+import { cn } from "../utils/cn";
+import { Sheet, SheetTrigger } from "./ui/sheet";
 import BookingInfo from "./booking-info";
 
 interface BookingItemProps {

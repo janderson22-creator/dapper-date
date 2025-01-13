@@ -30,7 +30,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { getDayBookings } from "../actions/get-day-bookings";
 import EmployeeItem from "./employee-item";
-import { cn } from "@/app/lib/utils";
+import { cn } from "@/app/utils/cn";
 import sendWhatsAppMessage from "../helpers/send-message-whatsapp";
 
 interface ServiceItemProps {

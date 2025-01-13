@@ -1,4 +1,4 @@
-import { cn } from "@/app/lib/utils";
+import { cn } from "@/app/utils/cn";
 import { ArrowDown } from "lucide-react";
 import {
   Dispatch,

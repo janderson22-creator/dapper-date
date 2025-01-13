@@ -67,14 +67,16 @@ model OpeningHour {
 }
 
 model Service {
-  id              String        @id @default(uuid())
-  name            String
-  price           Float
-  description     String
-  imageUrl        String
+  id          String @id @default(uuid())
+  name        String
+  price       Float
+  description String
+  imageUrl    String
+
   establishmentId String
   establishment   Establishment @relation(fields: [establishmentId], references: [id])
-  booking         Booking[]
+
+  booking Booking[]
 }
 
 model Booking {

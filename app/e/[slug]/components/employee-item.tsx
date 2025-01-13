@@ -3,7 +3,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/app/components/ui/avatar";
-import { cn } from "@/app/lib/utils";
+import { cn } from "@/app/utils/cn";
 import { Employee } from "@prisma/client";
 import React, { Dispatch } from "react";
 

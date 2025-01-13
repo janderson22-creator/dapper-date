@@ -11,7 +11,7 @@ import {
 import Image from "next/image";
 import { Badge } from "./ui/badge";
 import { format, isPast } from "date-fns";
-import { cn } from "../lib/utils";
+import { cn } from "@/app/utils/cn";
 import { Button } from "./ui/button";
 import {
   AlertDialogAction,

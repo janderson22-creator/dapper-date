@@ -10,12 +10,13 @@ import { Booking, Establishment } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
 import HeaderWeb from "../components/ui/header-web";
+import { organizeListByDate } from "../utils/organizeListByDate";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
   const [establishments, confirmedBookings] = await Promise.all([
-    db.establishment.findMany({}),
+    db.establishment.findMany(),
     session?.user
       ? db.booking.findMany({
           where: {
@@ -33,12 +34,8 @@ export default async function Home() {
       : Promise.resolve([]),
   ]);
 
-  confirmedBookings.sort(
-    (
-      a: { date: string | number | Date },
-      b: { date: string | number | Date }
-    ) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  console.log(establishments, "HERE");
+  // console.log(confirmedBookings);
 
   return (
     <div>
@@ -71,7 +68,7 @@ export default async function Home() {
               </h2>
 
               <div className="px-3 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden lg:[&::-webkit-scrollbar]:block lg:pb-4 scrollbar-modify">
-                {confirmedBookings.map(
+                {organizeListByDate(confirmedBookings).map(
                   (booking: Booking, index: Key | null | undefined) => (
                     <BookingItem booking={booking} key={index} />
                   )

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { cn } from "@/app/lib/utils";
+import { cn } from "@/app/utils/cn";
 import { toast } from "sonner";
 import { Upload } from "lucide-react";
 
@@ -61,7 +61,6 @@ const ImageUpload: React.FC<Props> = ({
         style={{ borderRadius: rounded }}
         className="w-full h-full flex items-center justify-center"
       >
-
         <Upload
           className={cn(
             "absolute top-0 bottom-0 left-0 right-0 m-auto z-[1] opacity-100 transition-all duration-500 cursor-pointer",

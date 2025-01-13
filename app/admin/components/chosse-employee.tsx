@@ -19,7 +19,8 @@ import { Calendar } from "@/app/components/ui/calendar";
 import { ptBR } from "date-fns/locale";
 import { Button } from "@/app/components/ui/button";
 import { Card, CardContent } from "@/app/components/ui/card";
-import { cn } from "@/app/lib/utils";
+import { cn } from "@/app/utils/cn";
+import { organizeListByDate } from "@/app/utils/organizeListByDate";
 
 interface ChooseEmployeeProps {
   paramsId: string | undefined;
@@ -99,13 +100,6 @@ const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({
     setCurrentDate(date);
     setSheetIsOpen(false);
   };
-
-  bookingsByEmployeeAndDateSelected.sort(
-    (
-      a: { date: string | number | Date },
-      b: { date: string | number | Date }
-    ) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
 
   return (
     <div>
@@ -232,7 +226,7 @@ const ChosseEmployee: React.FC<ChooseEmployeeProps> = ({
               </h2>
 
               <div className="flex flex-col gap-4">
-                {bookingsByEmployeeAndDateSelected.map(
+                {organizeListByDate(bookingsByEmployeeAndDateSelected).map(
                   (booking: Booking, index: React.Key | null | undefined) => (
                     <BookingAdminItem booking={booking} key={index} />
                   )
