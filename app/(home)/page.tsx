@@ -6,7 +6,7 @@ import BookingItem from "../components/booking-item";
 import { db } from "../lib/prisma";
 import EstablishmentItem from "./components/establishment-item";
 import { Key } from "react";
-import { Booking, Establishment } from "@prisma/client";
+import { Booking, Establishment, User } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
 import HeaderWeb from "../components/ui/header-web";
@@ -20,7 +20,7 @@ export default async function Home() {
     session?.user
       ? db.booking.findMany({
           where: {
-            userId: (session.user as any).id,
+            userId: (session.user as User).id,
             date: {
               gte: new Date(),
             },
@@ -33,9 +33,6 @@ export default async function Home() {
         })
       : Promise.resolve([]),
   ]);
-
-  console.log(establishments, "HERE");
-  // console.log(confirmedBookings);
 
   return (
     <div>

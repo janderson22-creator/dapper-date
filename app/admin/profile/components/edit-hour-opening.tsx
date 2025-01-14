@@ -79,8 +79,8 @@ const EditHourOpening: React.FC<EditHourOpeningProps> = ({
   }, [endTime, label, pauseAt, startTime]);
 
   return (
-    <div className="w-full cursor-pointer" ref={ref}>
-      <label className="text-xs text-gray-400" htmlFor="startAt">
+    <div aria-hidden="false" className="w-full cursor-pointer" ref={ref}>
+      <label className="text-xs text-gray-400" htmlFor={label}>
         {label} ás:
       </label>
       <div
@@ -101,10 +101,7 @@ const EditHourOpening: React.FC<EditHourOpeningProps> = ({
           </p>
 
           <div
-            className={cn(
-              "",
-              openTimes && "scale-100 transition-all rotate-180"
-            )}
+            className={cn(openTimes && "scale-100 transition-all rotate-180")}
           >
             <ArrowDown size={16} />
           </div>

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  /* .dark {
+  .dark {
     --background: 225 9% 9%;
     --foreground: 210 40% 98%;
 
@@ -33,7 +33,7 @@
     --ring: 212.7 26.8% 83.9%;
 
     --radius: 0.5rem;
-  } */
+  }
 
   /* .dark {
     --background: 22 3% 13%;
@@ -67,7 +67,7 @@
     --radius: 0.5rem;
   } */
 
-  .dark {
+  /* .dark {
     --background: 16 12% 13%;
     --foreground: 87 8% 94%;
 
@@ -97,7 +97,7 @@
     --ring: 38 27% 82%;
 
     --radius: 0.5rem;
-  }
+  } */
 }
 
 ::-webkit-scrollbar-track {
