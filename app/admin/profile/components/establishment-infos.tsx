@@ -14,20 +14,13 @@ import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { updateOpeningHours } from "../../actions/opening-hours/update-opening-hour";
 import EditHourOpening from "./edit-hour-opening";
+import { DAYS_OF_WEEK_ORDER } from "@/app/utils/daysOfWeek";
+import { Slider } from "@/app/components/ui/slider";
+import { updateEstablishment } from "../../actions/establishment-info/update-establishment";
 
 interface Props {
   establishment: Establishment;
 }
-
-const DAYS_OF_WEEK_ORDER = [
-  "domingo",
-  "segunda-feira",
-  "terca-feira",
-  "quarta-feira",
-  "quinta-feira",
-  "sexta-feira",
-  "sabado",
-];
 
 const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
   const [startTime, setStartTime] = useState("");
@@ -37,6 +30,11 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
   const [dayOfWeek, setDayOfWeek] = useState("");
   const [openingHourId, setOpeningHourId] = useState("");
   const [openModalId, setOpenModalId] = useState<string | null>(null);
+  const [serviceDuration, setServiceDuration] = useState(
+    establishment.serviceDuration
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const sortedOpeningHours = useMemo(
     () =>
@@ -116,12 +114,27 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
     [backAt, endTime, pauseAt, startTime]
   );
 
+  const handleUpdate = async () => {
+    setIsLoading(true); // Ativa o estado de carregamento
+    try {
+      await updateEstablishment({
+        id: establishment.id,
+        serviceDuration,
+      });
+
+      setIsSuccess(true); // Indica sucesso
+      setTimeout(() => setIsSuccess(false), 2000); // Reseta o estado após 2 segundos
+    } catch (error) {
+      console.error("Erro ao atualizar:", error);
+      setIsSuccess(false); // Garante que não exibe sucesso em caso de erro
+    } finally {
+      setIsLoading(false); // Desativa o estado de carregamento
+    }
+  };
+
   return (
-    <div className="p-4">
+    <div className="p-4 overflow-hidden">
       <p className="text-gray-400 font-bold uppercase">sobre nós</p>
-
-      <p className="text-sm mt-3">{establishment.description}</p>
-
       <div className="flex items-center justify-between border-y border-secondary py-2 my-6">
         <div className="flex items-center gap-2.5">
           <Smartphone />
@@ -218,6 +231,44 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
             </SheetContent>
           </Sheet>
         ))}
+      </div>
+
+      <div className="flex flex-col mb-10 relative">
+        <p className="text-gray-400 font-bold uppercase">
+          duração de um serviço
+        </p>
+        <div className="relative px-2 mb-10 mt-4">
+          <Slider
+            defaultValue={[serviceDuration]}
+            onValueChange={(value) => setServiceDuration(value[0])}
+            max={200}
+            step={5}
+            className="SliderRange"
+          />
+          <span
+            className="absolute left-0 top-[30px] transform -translate-y-1/2 text-sm font-semibold whitespace-nowrap"
+            style={{
+              left: `${(serviceDuration / 200) * 100}%`,
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            {serviceDuration} Min
+          </span>
+        </div>
+
+        <div className="flex items-center">
+          {/* <p className="text-gray-400 font-bold">
+            Tempo atual ({establishment.serviceDuration} Minutos)
+          </p> */}
+          <Button
+            onClick={() => handleUpdate()}
+            disabled={serviceDuration === establishment.serviceDuration}
+            className="w-fit ml-auto"
+            variant="secondary"
+          >
+            {isLoading ? "Alterando..." : isSuccess ? "Alterado" : "Alterar"}
+          </Button>
+        </div>
       </div>
     </div>
   );

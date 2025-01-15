@@ -22,18 +22,19 @@ model User {
 }
 
 model Establishment {
-  id           String        @id @default(uuid())
-  name         String
-  address      String
-  imageUrl     String
-  description  String
-  phoneNumber  String
-  slug         String        @unique
-  admin        Admin?
-  services     Service[]
-  bookings     Booking[]
-  openingHours OpeningHour[]
-  employees    Employee[]
+  id              String        @id @default(uuid())
+  name            String
+  address         String
+  imageUrl        String
+  description     String
+  phoneNumber     String
+  slug            String        @unique
+  serviceDuration Int           @default(30)
+  admin           Admin?
+  services        Service[]
+  bookings        Booking[]
+  openingHours    OpeningHour[]
+  employees       Employee[]
 }
 
 model Admin {

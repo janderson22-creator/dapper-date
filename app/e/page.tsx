@@ -21,7 +21,7 @@ const EstablishmentsPage: React.FC<EstablishmentPageProps> = async ({
     return redirect("/");
   }
 
-  const establishments = await db.establishment.findMany({
+  const establishments: Establishment[] = await db.establishment.findMany({
     where: {
       name: {
         contains: searchParams.search,
@@ -36,7 +36,10 @@ const EstablishmentsPage: React.FC<EstablishmentPageProps> = async ({
 
       <div className="px-5 py-6 flex flex-col gap-6">
         <div className="flex items-center w-full">
-          <Link className="flex items-center justify-center border w-10 h-10 rounded-lg mr-2" href="/">
+          <Link
+            className="flex items-center justify-center border w-10 h-10 rounded-lg mr-2"
+            href="/"
+          >
             <ChevronLeftIcon />
           </Link>
           <Search
@@ -51,11 +54,9 @@ const EstablishmentsPage: React.FC<EstablishmentPageProps> = async ({
         </h1>
 
         <div className="flex flex-wrap gap-3 mt-3">
-          {establishments.map(
-            (establishment: Establishment, index: Key | null | undefined) => (
-              <EstablishmentItem establishment={establishment} key={index} />
-            )
-          )}
+          {establishments.map((establishment, index) => (
+            <EstablishmentItem establishment={establishment} key={index} />
+          ))}
         </div>
       </div>
     </div>

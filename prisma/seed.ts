@@ -123,6 +123,7 @@ async function seedDatabase() {
           description: description,
           phoneNumber: phoneNumber,
           slug: name.replace(/\s+/g, "").replace(/[^\w\s]/gi, ""),
+          serviceDuration: 60,
           openingHours: {
             create: [
               {

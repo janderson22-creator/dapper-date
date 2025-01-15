@@ -12,6 +12,7 @@ interface Props {
 }
 
 const Services: React.FC<Props> = ({ establishment, HasUser }) => {
+  const services: Service[] = establishment.services;
   const [optionSelected, setOptionSelected] = useState<Options>("serviços");
 
   return (
@@ -31,16 +32,14 @@ const Services: React.FC<Props> = ({ establishment, HasUser }) => {
 
       {optionSelected === "serviços" && (
         <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3 lg:gap-4 px-5 pt-6">
-          {establishment?.services?.map(
-            (service: Service, index: Key | null | undefined) => (
-              <ServiceItem
-                key={index}
-                service={service}
-                establishment={establishment}
-                isAuthenticated={HasUser}
-              />
-            )
-          )}
+          {services.map((service, index) => (
+            <ServiceItem
+              key={index}
+              service={service}
+              establishment={establishment}
+              isAuthenticated={HasUser}
+            />
+          ))}
         </div>
       )}
 

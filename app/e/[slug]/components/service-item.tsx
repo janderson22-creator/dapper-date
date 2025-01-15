@@ -32,6 +32,7 @@ import { getDayBookings } from "../actions/get-day-bookings";
 import EmployeeItem from "./employee-item";
 import { cn } from "@/app/utils/cn";
 import sendWhatsAppMessage from "../helpers/send-message-whatsapp";
+import { DAYS_OF_WEEK_ORDER } from "@/app/utils/daysOfWeek";
 
 interface ServiceItemProps {
   establishment: Establishment;
@@ -46,6 +47,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
 }) => {
   const router = useRouter();
   const { data } = useSession();
+  const employees: Employee[] = establishment.employees;
   const [date, setDate] = useState<Date | undefined>();
   const [hour, setHour] = useState<string | undefined>();
   const [loadingEmployeeSelected, setLoadingEmployeeSelected] = useState(false);
@@ -60,17 +62,8 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   const [booking, setBooking] = useState<Date | undefined>();
 
   const getDayOfWeek = (date: Date): string => {
-    const daysOfWeek = [
-      "domingo",
-      "segunda-feira",
-      "terca-feira",
-      "quarta-feira",
-      "quinta-feira",
-      "sexta-feira",
-      "sabado",
-    ];
     const dayIndex = date.getDay();
-    return daysOfWeek[dayIndex];
+    return DAYS_OF_WEEK_ORDER[dayIndex];
   };
 
   const getOpeningHourByDay = useMemo(() => {
@@ -99,7 +92,6 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   // get available hours of date selected
   useEffect(() => {
     if (!date || !employeeSelected) return;
-    // TODO: GET DAY BOOKINGS BY EMPLOYEE ID
     const refreshAvailableHours = async () => {
       const bookingsDay = await getDayBookings(
         date,
@@ -205,6 +197,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     const backAtFormatted = parseInt(getOpeningHourByDay.backAt.split(":")[0]);
 
     return generateDayTimeList(
+      establishment.serviceDuration,
       date,
       startTimeFormatted,
       endTimeFormatted
@@ -231,6 +224,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     date,
     dayBookings,
     employeeSelected,
+    establishment.serviceDuration,
     getOpeningHourByDay,
     loadingEmployeeSelected,
   ]);
@@ -400,23 +394,17 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                       <div
                         className={cn(
                           "flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden lg:[&::-webkit-scrollbar]:block lg:pb-4",
-                          establishment.employees.length <= 2 &&
-                            "items-center justify-center"
+                          employees.length <= 2 && "items-center justify-center"
                         )}
                       >
-                        {establishment.employees.map(
-                          (
-                            employee: Employee,
-                            index: Key | null | undefined
-                          ) => (
-                            <EmployeeItem
-                              employeeSelected={employeeSelected}
-                              setEmployeeSelected={changeEmployee}
-                              employee={employee}
-                              key={index}
-                            />
-                          )
-                        )}
+                        {employees.map((employee, index) => (
+                          <EmployeeItem
+                            employeeSelected={employeeSelected}
+                            setEmployeeSelected={changeEmployee}
+                            employee={employee}
+                            key={index}
+                          />
+                        ))}
                       </div>
                     </div>
                   )}
