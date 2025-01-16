@@ -115,20 +115,20 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
   );
 
   const handleUpdate = async () => {
-    setIsLoading(true); // Ativa o estado de carregamento
+    setIsLoading(true);
     try {
       await updateEstablishment({
         id: establishment.id,
         serviceDuration,
       });
 
-      setIsSuccess(true); // Indica sucesso
-      setTimeout(() => setIsSuccess(false), 2000); // Reseta o estado após 2 segundos
+      setIsSuccess(true);
+      setTimeout(() => setIsSuccess(false), 2000);
     } catch (error) {
       console.error("Erro ao atualizar:", error);
-      setIsSuccess(false); // Garante que não exibe sucesso em caso de erro
+      setIsSuccess(false);
     } finally {
-      setIsLoading(false); // Desativa o estado de carregamento
+      setIsLoading(false);
     }
   };
 

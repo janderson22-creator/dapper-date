@@ -38,6 +38,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/app/components/ui/alert-dialog";
+import { validateAdminAccess } from "../../utils/validateAdminAccess";
 
 interface EmployeesAdminProps {
   employees: Employee;
@@ -60,24 +61,8 @@ const EmployeesAdmin: React.FC<EmployeesAdminProps> = ({
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const adminJson = localStorage.getItem("admin");
-
-      if (!adminJson || !paramsId) {
-        return router.push("/");
-      }
-
-      const admin: Admin = JSON.parse(adminJson);
-      const isAdmin = paramsId === admin.establishmentId;
-
-      if (!isAdmin) {
-        return router.push("/");
-      }
-
-      setLoadingAdmin(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    validateAdminAccess(router, paramsId, setLoadingAdmin);
+  }, [paramsId, router]);
 
   const editEmployee = (employee: Employee) => {
     setEmployeeSelected(employee);

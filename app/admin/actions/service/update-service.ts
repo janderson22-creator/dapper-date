@@ -5,10 +5,11 @@ import { revalidatePath } from "next/cache";
 
 interface UpdateServiceParams {
   serviceId: string;
-  imageUrl: string;
-  name: string;
-  description: string;
-  price: number;
+  imageUrl?: string;
+  name?: string;
+  description?: string;
+  price?: number;
+  duration?: number;
 }
 
 export const updateService = async (params: UpdateServiceParams) => {
@@ -21,6 +22,7 @@ export const updateService = async (params: UpdateServiceParams) => {
       name: params.name,
       description: params.description,
       price: params.price,
+      duration: params.duration,
     },
   });
 

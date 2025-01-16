@@ -73,6 +73,7 @@ model Service {
   price       Float
   description String
   imageUrl    String
+  duration    Int    @default(30)
 
   establishmentId String
   establishment   Establishment @relation(fields: [establishmentId], references: [id])

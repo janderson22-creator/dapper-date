@@ -21,8 +21,8 @@ import {
 import { ptBR } from "date-fns/locale";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
-import { Key, useCallback, useEffect, useMemo, useState } from "react";
-import { generateDayTimeList } from "../helpers/hours";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { listAvailableTimes } from "../helpers/hours";
 import { format, setHours, setMinutes } from "date-fns";
 import { saveBooking } from "../actions/save-booking";
 import { ArrowDown, Loader2 } from "lucide-react";
@@ -48,9 +48,9 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   const router = useRouter();
   const { data } = useSession();
   const employees: Employee[] = establishment.employees;
+  const openingHour: OpeningHour[] = establishment.openingHours;
   const [date, setDate] = useState<Date | undefined>();
   const [hour, setHour] = useState<string | undefined>();
-  const [loadingEmployeeSelected, setLoadingEmployeeSelected] = useState(false);
   const [employeeSelected, setEmployeeSelected] = useState<
     Employee | undefined
   >();
@@ -60,63 +60,63 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   const [sheetConfirmIsOpen, setSheetConfirmIsOpen] = useState(false);
   const [dayBookings, setDayBookings] = useState<Booking>([]);
   const [booking, setBooking] = useState<Date | undefined>();
+  const dayOfWeek = date ? DAYS_OF_WEEK_ORDER[date.getDay()] : undefined;
 
-  const getDayOfWeek = (date: Date): string => {
-    const dayIndex = date.getDay();
-    return DAYS_OF_WEEK_ORDER[dayIndex];
-  };
-
-  const getOpeningHourByDay = useMemo(() => {
+  const openingHourBySelectedDay = useMemo(() => {
     if (!date) return undefined;
 
-    const selectedDayOfWeek = getDayOfWeek(date);
-
-    const openingHoursForSelectedDay = establishment.openingHours.find(
-      (openingHour: OpeningHour) => openingHour.dayOfWeek === selectedDayOfWeek
-    );
-
-    return openingHoursForSelectedDay.startTime
-      ? openingHoursForSelectedDay
-      : undefined;
-  }, [date, establishment.openingHours]);
+    return openingHour.find((oh) => oh.dayOfWeek === dayOfWeek);
+  }, [date, dayOfWeek, openingHour]);
 
   useEffect(() => {
-    if (!date || getOpeningHourByDay) return;
-    const selectedDayOfWeek = getDayOfWeek(date);
-
-    toast.error(
-      `O estabelecimento ${establishment.name} não funciona ${selectedDayOfWeek}`
-    );
-  }, [date, establishment, establishment.name, getOpeningHourByDay]);
-
-  // get available hours of date selected
-  useEffect(() => {
-    if (!date || !employeeSelected) return;
-    const refreshAvailableHours = async () => {
-      const bookingsDay = await getDayBookings(
-        date,
-        establishment.id,
-        employeeSelected.id
-      );
-
-      setDayBookings(bookingsDay);
-    };
-
-    refreshAvailableHours();
-  }, [date, employeeSelected, establishment.id, getOpeningHourByDay]);
-
-  const dateClick = (date: Date | undefined) => {
-    setDate(date);
-    setHour(undefined);
-    setEmployeeSelected(undefined);
-    setSheetDateIsOpen(false);
-  };
-
-  const loginClick = () => {
-    if (!isAuthenticated) {
-      return signIn("google");
+    if (date && employeeSelected) {
+      getDayBookings(date, establishment.id, employeeSelected.id)
+        .then(setDayBookings)
+        .catch((error) => console.error("Error fetching bookings:", error));
     }
+  }, [date, employeeSelected, establishment.id, openingHourBySelectedDay]);
+
+  const initialNumberOfHour = (hour: string) => {
+    return parseInt(hour.split(":")[0]);
   };
+
+  const timeList = useMemo(() => {
+    if (!date || !openingHourBySelectedDay || !employeeSelected) return [];
+
+    return listAvailableTimes(
+      establishment.serviceDuration,
+      date,
+      initialNumberOfHour(openingHourBySelectedDay.startTime),
+      initialNumberOfHour(openingHourBySelectedDay.endTime)
+    ).filter((time) => {
+      const hour = Number(time.split(":")[0]);
+      const minutes = Number(time.split(":")[1]);
+
+      // Verifica se o horário está dentro do intervalo de pausa
+      if (
+        initialNumberOfHour(openingHourBySelectedDay.pauseAt) <= hour &&
+        hour < initialNumberOfHour(openingHourBySelectedDay.backAt)
+      ) {
+        return false; // Ignora horários dentro do intervalo de pausa
+      }
+
+      // Verifica se há uma reserva para o horário atual
+      const bookingList = dayBookings.find((booking: Booking) => {
+        const bookingHour = booking?.date.getHours();
+        const bookingMinutes = booking?.date.getMinutes();
+
+        return bookingHour === hour && bookingMinutes === minutes;
+      });
+
+      return !bookingList;
+    });
+  }, [
+    date,
+    dayBookings,
+    employeeSelected,
+    establishment.serviceDuration,
+    openingHourBySelectedDay,
+  ]);
 
   const bookingSubmit = useCallback(async () => {
     setSubmitIsLoading(true);
@@ -165,70 +165,6 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     service.id,
   ]);
 
-  const changeEmployee = useCallback(async (employee: Employee) => {
-    setLoadingEmployeeSelected(true);
-    try {
-      setHour(undefined);
-      setEmployeeSelected(employee);
-    } finally {
-      setLoadingEmployeeSelected(false);
-    }
-  }, []);
-
-  const timeList = useMemo(() => {
-    if (
-      !date ||
-      !getOpeningHourByDay ||
-      loadingEmployeeSelected ||
-      !employeeSelected
-    )
-      return [];
-
-    const startTimeFormatted = parseInt(
-      getOpeningHourByDay.startTime.split(":")[0]
-    );
-    const endTimeFormatted = parseInt(
-      getOpeningHourByDay.endTime.split(":")[0]
-    );
-
-    const pauseAtFormatted = parseInt(
-      getOpeningHourByDay.pauseAt.split(":")[0]
-    );
-    const backAtFormatted = parseInt(getOpeningHourByDay.backAt.split(":")[0]);
-
-    return generateDayTimeList(
-      establishment.serviceDuration,
-      date,
-      startTimeFormatted,
-      endTimeFormatted
-    ).filter((time) => {
-      const timeHour = Number(time.split(":")[0]);
-      const timeMinutes = Number(time.split(":")[1]);
-
-      // Verifica se o horário está dentro do intervalo de pausa
-      if (pauseAtFormatted <= timeHour && timeHour < backAtFormatted) {
-        return false; // Ignora horários dentro do intervalo de pausa
-      }
-
-      // Verifica se há uma reserva para o horário atual
-      const bookingList = dayBookings.find((booking: Booking) => {
-        const bookingHour = booking?.date.getHours();
-        const bookingMinutes = booking?.date.getMinutes();
-
-        return bookingHour === timeHour && bookingMinutes === timeMinutes;
-      });
-
-      return !bookingList;
-    });
-  }, [
-    date,
-    dayBookings,
-    employeeSelected,
-    establishment.serviceDuration,
-    getOpeningHourByDay,
-    loadingEmployeeSelected,
-  ]);
-
   const sendMessage = () => {
     if (!booking) return;
 
@@ -259,6 +195,19 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     setDate(undefined);
     setEmployeeSelected(undefined);
   }, [sheetConfirmIsOpen]);
+
+  const dateClick = (date: Date | undefined) => {
+    setDate(date);
+    setHour(undefined);
+    setEmployeeSelected(undefined);
+    setSheetDateIsOpen(false);
+  };
+
+  const loginClick = () => {
+    if (!isAuthenticated) {
+      return signIn("google");
+    }
+  };
 
   return (
     <Card className="lg:max-w-[350px]">
@@ -379,14 +328,14 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                     </SheetContent>
                   </Sheet>
 
-                  {date && !getOpeningHourByDay && (
+                  {date && !openingHourBySelectedDay && (
                     <div className="text-center font-semibold px-4">
                       O estabelecimento {establishment.name} não funciona{" "}
-                      {getDayOfWeek(date)}!
+                      {dayOfWeek}!
                     </div>
                   )}
 
-                  {getOpeningHourByDay && (
+                  {openingHourBySelectedDay && (
                     <div className="border-t border-secondary py-4">
                       <h2 className="pl-3 text-xs uppercase text-gray-400 font-bold mb-3">
                         Selecione um profissional
@@ -400,7 +349,10 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                         {employees.map((employee, index) => (
                           <EmployeeItem
                             employeeSelected={employeeSelected}
-                            setEmployeeSelected={changeEmployee}
+                            setEmployeeSelected={(employee) => {
+                              setHour(undefined);
+                              setEmployeeSelected(employee);
+                            }}
                             employee={employee}
                             key={index}
                           />
@@ -415,7 +367,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                         Selecione um horário
                       </h2>
                       <div className="flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden lg:[&::-webkit-scrollbar]:block lg:pb-4">
-                        {!loadingEmployeeSelected && timeList.length ? (
+                        {timeList.length ? (
                           timeList.map((time, index) => (
                             <Button
                               onClick={() => setHour(time)}
@@ -428,7 +380,8 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
                           ))
                         ) : (
                           <p className="text-sm text-center font-semibold text-red-400">
-                            Não possui mais horários disponiveis para este dia.
+                            Estabelecimento fechado ou não possui mais horários
+                            disponiveis para este dia.
                           </p>
                         )}
                       </div>

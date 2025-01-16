@@ -1,6 +1,6 @@
 import { setHours, setMinutes, format, addMinutes, isToday } from "date-fns";
 
-export function generateDayTimeList(
+export function listAvailableTimes(
   serviceDuration: number,
   date: Date,
   startAt: number,
@@ -42,5 +42,6 @@ export function generateDayTimeList(
     currentTime = addMinutes(currentTime, serviceDuration);
   }
 
+  console.log(timeList);
   return timeList;
 }
