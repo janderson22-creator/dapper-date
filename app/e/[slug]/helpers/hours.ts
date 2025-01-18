@@ -42,6 +42,5 @@ export function listAvailableTimes(
     currentTime = addMinutes(currentTime, serviceDuration);
   }
 
-  console.log(timeList);
   return timeList;
 }

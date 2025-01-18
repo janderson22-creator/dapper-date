@@ -23,7 +23,16 @@ import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { listAvailableTimes } from "../helpers/hours";
-import { format, setHours, setMinutes } from "date-fns";
+import {
+  addHours,
+  addMinutes,
+  format,
+  isAfter,
+  isToday,
+  parse,
+  setHours,
+  setMinutes,
+} from "date-fns";
 import { saveBooking } from "../actions/save-booking";
 import { ArrowDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -76,47 +85,66 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     }
   }, [date, employeeSelected, establishment.id, openingHourBySelectedDay]);
 
-  const initialNumberOfHour = (hour: string) => {
-    return parseInt(hour.split(":")[0]);
-  };
-
   const timeList = useMemo(() => {
     if (!date || !openingHourBySelectedDay || !employeeSelected) return [];
 
-    return listAvailableTimes(
-      establishment.serviceDuration,
-      date,
-      initialNumberOfHour(openingHourBySelectedDay.startTime),
-      initialNumberOfHour(openingHourBySelectedDay.endTime)
-    ).filter((time) => {
-      const hour = Number(time.split(":")[0]);
-      const minutes = Number(time.split(":")[1]);
+    const { startTime, endTime, pauseAt, backAt } = openingHourBySelectedDay;
 
-      // Verifica se o horário está dentro do intervalo de pausa
-      if (
-        initialNumberOfHour(openingHourBySelectedDay.pauseAt) <= hour &&
-        hour < initialNumberOfHour(openingHourBySelectedDay.backAt)
-      ) {
-        return false; // Ignora horários dentro do intervalo de pausa
+    const start = parse(startTime, "HH:mm", date);
+    const end = parse(endTime, "HH:mm", date);
+    const pause = pauseAt ? parse(pauseAt, "HH:mm", date) : null;
+    const back = backAt ? parse(backAt, "HH:mm", date) : null;
+
+    let listHours = [];
+    let current = start;
+
+    const getServiceDuration = (time: Date) => {
+      const booking = dayBookings.find((booking: Booking) => {
+        const bookingHour = booking.date.getHours();
+        const bookingMinutes = booking.date.getMinutes();
+        const timeHour = time.getHours();
+        const timeMinutes = time.getMinutes();
+        return bookingHour === timeHour && bookingMinutes === timeMinutes;
+      });
+      return booking?.service?.duration || 30;
+    };
+
+    while (current <= end) {
+      if (!pause || !back || current < pause || current >= back) {
+        listHours.push(current);
       }
 
-      // Verifica se há uma reserva para o horário atual
-      const bookingList = dayBookings.find((booking: Booking) => {
+      const intervalMinutes = getServiceDuration(current);
+      current = addMinutes(current, intervalMinutes);
+
+      if (pause && back && current > pause && current < back) {
+        current = back;
+      }
+    }
+
+    const isBooked = (time: Date) => {
+      return dayBookings.some((booking: Booking) => {
         const bookingHour = booking?.date.getHours();
         const bookingMinutes = booking?.date.getMinutes();
-
-        return bookingHour === hour && bookingMinutes === minutes;
+        const timeHour = time.getHours();
+        const timeMinutes = time.getMinutes();
+        return bookingHour === timeHour && bookingMinutes === timeMinutes;
       });
+    };
 
-      return !bookingList;
-    });
-  }, [
-    date,
-    dayBookings,
-    employeeSelected,
-    establishment.serviceDuration,
-    openingHourBySelectedDay,
-  ]);
+    listHours = listHours.filter((time) => !isBooked(time));
+
+    if (isToday(date)) {
+      const now = new Date();
+      listHours = listHours
+        .filter((time) => isAfter(time, now))
+        .map((time) => format(time, "HH:mm"));
+    } else {
+      listHours = listHours.map((time) => format(time, "HH:mm"));
+    }
+
+    return listHours;
+  }, [date, dayBookings, employeeSelected, openingHourBySelectedDay]);
 
   const bookingSubmit = useCallback(async () => {
     setSubmitIsLoading(true);
