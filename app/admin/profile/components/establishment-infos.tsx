@@ -15,7 +15,6 @@ import { toast } from "sonner";
 import { updateOpeningHours } from "../../actions/opening-hours/update-opening-hour";
 import EditHourOpening from "./edit-hour-opening";
 import { DAYS_OF_WEEK_ORDER } from "@/app/utils/daysOfWeek";
-import { Slider } from "@/app/components/ui/slider";
 import { updateEstablishment } from "../../actions/establishment-info/update-establishment";
 
 interface Props {
@@ -30,11 +29,6 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
   const [dayOfWeek, setDayOfWeek] = useState("");
   const [openingHourId, setOpeningHourId] = useState("");
   const [openModalId, setOpenModalId] = useState<string | null>(null);
-  const [serviceDuration, setServiceDuration] = useState(
-    establishment.serviceDuration
-  );
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const sortedOpeningHours = useMemo(
     () =>
@@ -113,24 +107,6 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
     },
     [backAt, endTime, pauseAt, startTime]
   );
-
-  const handleUpdate = async () => {
-    setIsLoading(true);
-    try {
-      await updateEstablishment({
-        id: establishment.id,
-        serviceDuration,
-      });
-
-      setIsSuccess(true);
-      setTimeout(() => setIsSuccess(false), 2000);
-    } catch (error) {
-      console.error("Erro ao atualizar:", error);
-      setIsSuccess(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="p-4 overflow-hidden">
@@ -231,44 +207,6 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
             </SheetContent>
           </Sheet>
         ))}
-      </div>
-
-      <div className="flex flex-col mb-10 relative">
-        <p className="text-gray-400 font-bold uppercase">
-          duração de um serviço
-        </p>
-        <div className="relative px-2 mb-10 mt-4">
-          <Slider
-            defaultValue={[serviceDuration]}
-            onValueChange={(value) => setServiceDuration(value[0])}
-            max={200}
-            step={5}
-            className="SliderRange"
-          />
-          <span
-            className="absolute left-0 top-[30px] transform -translate-y-1/2 text-sm font-semibold whitespace-nowrap"
-            style={{
-              left: `${(serviceDuration / 200) * 100}%`,
-              transform: "translate(-50%, -50%)",
-            }}
-          >
-            {serviceDuration} Min
-          </span>
-        </div>
-
-        <div className="flex items-center">
-          {/* <p className="text-gray-400 font-bold">
-            Tempo atual ({establishment.serviceDuration} Minutos)
-          </p> */}
-          <Button
-            onClick={() => handleUpdate()}
-            disabled={serviceDuration === establishment.serviceDuration}
-            className="w-fit ml-auto"
-            variant="secondary"
-          >
-            {isLoading ? "Alterando..." : isSuccess ? "Alterado" : "Alterar"}
-          </Button>
-        </div>
       </div>
     </div>
   );

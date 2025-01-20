@@ -10,7 +10,7 @@ interface UpdateEstablishmentParams {
   phoneNumber?: string;
   address?: string;
   description?: string;
-  serviceDuration?: number;
+  averageTimeService?: number;
 }
 
 export const updateEstablishment = async (
@@ -26,7 +26,7 @@ export const updateEstablishment = async (
       phoneNumber: params.phoneNumber,
       address: params.address,
       description: params.description,
-      serviceDuration: params.serviceDuration,
+      averageTimeService: params.averageTimeService,
     },
   });
 

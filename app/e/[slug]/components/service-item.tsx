@@ -22,9 +22,7 @@ import { ptBR } from "date-fns/locale";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { listAvailableTimes } from "../helpers/hours";
 import {
-  addHours,
   addMinutes,
   format,
   isAfter,

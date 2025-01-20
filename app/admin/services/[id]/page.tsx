@@ -1,5 +1,5 @@
 import { db } from "@/app/lib/prisma";
-import { Service } from "@prisma/client";
+import { Establishment, Service } from "@prisma/client";
 import HeaderAdmin from "../../components/header-admin";
 import ServiceItemAdmin from "../components/service-item-admin";
 
@@ -10,13 +10,18 @@ interface EmployeesPageProps {
 }
 
 const Services: React.FC<EmployeesPageProps> = async ({ params }) => {
+  const establishment: Establishment = await db.establishment.findUnique({
+    where: {
+      id: params.id,
+    },
+  });
+
   const services: Service = await db.service.findMany({
     where: {
       establishmentId: params.id,
     },
     include: {
-      establishment: true,
-      booking: true
+      booking: true,
     },
   });
 
@@ -25,7 +30,7 @@ const Services: React.FC<EmployeesPageProps> = async ({ params }) => {
       <HeaderAdmin paramsId={params.id} />
 
       <div className="flex flex-col gap-3 px-5 pt-4">
-        <ServiceItemAdmin services={services} paramsId={params.id} />
+        <ServiceItemAdmin establishment={establishment} services={services} />
       </div>
     </div>
   );

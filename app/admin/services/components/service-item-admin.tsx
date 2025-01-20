@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Admin, Booking, Employee, Service } from "@prisma/client";
+import { Employee, Establishment, Service } from "@prisma/client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, PlusCircle } from "lucide-react";
@@ -35,31 +35,36 @@ import {
 } from "@/app/components/ui/alert-dialog";
 import { Slider } from "@/app/components/ui/slider";
 import { validateAdminAccess } from "../../utils/validateAdminAccess";
+import { cn } from "@/app/utils/cn";
+import { updateEstablishment } from "../../actions/establishment-info/update-establishment";
 
 interface EmployeesAdminProps {
+  establishment: Establishment;
   services: Service;
-  paramsId: string | undefined;
 }
 
 const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
+  establishment,
   services,
-  paramsId,
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [loadingAdmin, setLoadingAdmin] = useState<boolean>(true);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
-  const [serviceSelected, setServiceSelected] = useState<
-    Employee | undefined
-  >();
+  const [serviceSelected, setServiceSelected] = useState<Service | undefined>();
   const [imageUrl, setImageUrl] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [serviceDuration, setServiceDuration] = useState(0);
+  const [averageTimeService, setAverageTimeService] = useState(
+    establishment.averageTimeService
+  );
   const router = useRouter();
 
   useEffect(() => {
-    validateAdminAccess(router, paramsId, setLoadingAdmin);
-  }, [paramsId, router]);
+    validateAdminAccess(router, establishment.id, setLoadingAdmin);
+  }, [establishment.id, router]);
 
   useEffect(() => {
     if (!sheetIsOpen) {
@@ -85,7 +90,13 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
 
   const submitService = async () => {
     // TODO ADICIONAR ERROR HANDLING
-    if (!paramsId || !name || !description || !price || !serviceDuration)
+    if (
+      !establishment.id ||
+      !name ||
+      !description ||
+      !price ||
+      !serviceDuration
+    )
       return;
 
     try {
@@ -95,7 +106,7 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
         description,
         price: parseFloat(price),
         duration: serviceDuration,
-        establishmentId: paramsId,
+        establishmentId: establishment.id,
       };
 
       if (serviceSelected) {
@@ -126,10 +137,10 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
   );
 
   useEffect(() => {
-    if (serviceSelected) {
-      setServiceDuration(serviceSelected.duration);
-    }
-  }, [serviceSelected]);
+    setServiceDuration(
+      serviceSelected?.duration || establishment.averageTimeService
+    );
+  }, [establishment.averageTimeService, serviceSelected]);
 
   if (loadingAdmin) {
     return (
@@ -139,26 +150,79 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
     );
   }
 
+  const handleUpdate = async () => {
+    setIsLoading(true);
+    try {
+      await updateEstablishment({
+        id: establishment.id,
+        averageTimeService,
+      });
+
+      setIsSuccess(true);
+      setTimeout(() => setIsSuccess(false), 2000);
+    } catch (error) {
+      ("");
+      console.error("Erro ao atualizar:", error);
+      setIsSuccess(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h2 className="pl-2 text-xs uppercase text-gray-400 font-bold">
-          Serviços
-        </h2>
+      <div className="flex flex-col justify-between">
+        <div className="flex flex-col mb-4 relative">
+          <p className="text-xs uppercase text-gray-400 font-bold">
+            duração média dos serviços
+          </p>
+          <div className="relative mt-3 mb-10">
+            <Slider
+              defaultValue={[averageTimeService]}
+              onValueChange={(value) => setAverageTimeService(value[0])}
+              max={200}
+              step={5}
+              className="SliderRange"
+            />
+            <span
+              className="absolute left-0 top-[30px] transform -translate-y-1/2 text-sm font-semibold whitespace-nowrap"
+              style={{
+                left: `${(averageTimeService / 200) * 100}%`,
+                transform: "translate(-50%, -50%)",
+              }}
+            >
+              {averageTimeService} Min
+            </span>
+          </div>
+
+          <Button
+            onClick={() => handleUpdate()}
+            disabled={averageTimeService === establishment.averageTimeService}
+            className="w-full"
+            variant="default"
+          >
+            {isLoading ? "Alterando..." : isSuccess ? "Alterado" : "Alterar"}
+          </Button>
+        </div>
 
         <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
-          <SheetTrigger className="cursor-pointer mb-2" asChild>
-            <PlusCircle />
-          </SheetTrigger>
+          <div className="flex items-center">
+            <h2 className="text-xs uppercase text-gray-400 font-bold">
+              Serviços
+            </h2>
+            <SheetTrigger className="cursor-pointer mb-2 ml-auto" asChild>
+              <PlusCircle />
+            </SheetTrigger>
+          </div>
 
-          <SheetContent>
-            <SheetHeader className="px-5 py-2 border-b border-secondary">
+          <SheetContent className="w-[90%] px-4">
+            <SheetHeader className="px-2 pb-2 border-b border-secondary">
               <SheetTitle>
                 {serviceSelected ? "Editar" : "Adicionar"} Serviço
               </SheetTitle>
             </SheetHeader>
 
-            <div className="flex flex-col items-center mt-10">
+            <div className="flex flex-col items-center mt-2">
               <ImageUpload
                 height={170}
                 width={170}
@@ -169,6 +233,7 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
 
               <div className="w-full flex flex-col items-center">
                 <Input
+                  className="text-xs"
                   placeholder="Nome"
                   type="text"
                   value={name}
@@ -177,7 +242,7 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
                 />
 
                 <Input
-                  className="mt-4"
+                  className="mt-3 text-xs"
                   placeholder="Preço"
                   type="number"
                   value={price}
@@ -186,7 +251,7 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
                 />
 
                 <Textarea
-                  className="text-xs resize-none mt-4"
+                  className="text-xs resize-none mt-3"
                   id="description"
                   name="description"
                   placeholder="Descrição"
@@ -199,20 +264,20 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
                 </p>
               </div>
 
-              <div className="w-full flex flex-col mb-10 relative">
-                <p className="text-gray-400 font-bold uppercase">
-                  duração de um serviço
+              <div className="w-full flex flex-col relative">
+                <p className="text-gray-400 font-medium text-xs">
+                  Duração do serviço
                 </p>
-                <div className="relative px-2 mb-10 mt-4">
+                <div className="relative mt-4">
                   <Slider
-                    defaultValue={[serviceDuration]}
+                    value={[serviceDuration]}
                     onValueChange={(value) => setServiceDuration(value[0])}
                     max={200}
                     step={5}
                     className="SliderRange"
                   />
                   <span
-                    className="absolute left-0 top-[30px] transform -translate-y-1/2 text-sm font-semibold whitespace-nowrap"
+                    className="text-xs absolute left-0 top-[30px] transform -translate-y-1/2 font-semibold whitespace-nowrap"
                     style={{
                       left: `${(serviceDuration / 200) * 100}%`,
                       transform: "translate(-50%, -50%)",
@@ -220,53 +285,73 @@ const ServiceItemAdmin: React.FC<EmployeesAdminProps> = ({
                   >
                     {serviceDuration} Min
                   </span>
+
+                  {serviceSelected && (
+                    <Button
+                      onClick={() =>
+                        setServiceDuration(establishment.averageTimeService)
+                      }
+                      className="w-full mt-10 text-xs"
+                      variant="outline"
+                    >
+                      Definir tempo médio de {establishment?.averageTimeService}{" "}
+                      min
+                    </Button>
+                  )}
                 </div>
               </div>
 
-              <SheetClose asChild>
-                <Button
-                  onClick={submitService}
-                  className="w-full mt-5"
-                  type="submit"
-                >
-                  Salvar
-                </Button>
-              </SheetClose>
+              <div
+                className={cn(
+                  "flex items-center w-full gap-2 mt-10",
+                  serviceSelected && "mt-5"
+                )}
+              >
+                <SheetClose asChild>
+                  <Button
+                    onClick={submitService}
+                    className="w-full"
+                    type="submit"
+                  >
+                    Salvar
+                  </Button>
+                </SheetClose>
 
-              {serviceSelected && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="w-full mt-2">
-                      Excluir
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="w-[90%] rounded-lg">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Excluir Serviço</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        {serviceHasBookings
-                          ? "Esse serviço não pode ser excluir pois possui agendamentos em aberto para ele, falar com nosso suporte."
-                          : "Tem certeza que deseja remover esse serviço?"}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="flex-row gap-3">
-                      <AlertDialogCancel className="w-full mt-0">
-                        Voltar
-                      </AlertDialogCancel>
+                {serviceSelected && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" className="w-full">
+                        Excluir Serviço
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="w-[90%] rounded-lg">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Excluir Serviço</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {serviceHasBookings
+                            ? "Esse serviço não pode ser excluir pois possui agendamentos em aberto para ele, falar com nosso suporte."
+                            : "Tem certeza que deseja remover esse serviço?"}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter className="flex-row gap-3">
+                        <AlertDialogCancel className="w-full mt-0">
+                          Voltar
+                        </AlertDialogCancel>
 
-                      <SheetClose asChild>
-                        <AlertDialogAction
-                          disabled={serviceHasBookings}
-                          className="w-full"
-                          onClick={() => handleDeleteService()}
-                        >
-                          Confirmar
-                        </AlertDialogAction>
-                      </SheetClose>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
+                        <SheetClose asChild>
+                          <AlertDialogAction
+                            disabled={serviceHasBookings}
+                            className="w-full"
+                            onClick={() => handleDeleteService()}
+                          >
+                            Confirmar
+                          </AlertDialogAction>
+                        </SheetClose>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
             </div>
           </SheetContent>
         </Sheet>

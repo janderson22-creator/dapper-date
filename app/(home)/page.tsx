@@ -61,7 +61,7 @@ export default async function Home() {
           {confirmedBookings.length > 0 && (
             <>
               <h2 className="pl-3 text-xs lg:text-lg uppercase text-gray-400 font-bold mb-3">
-                Agendamentos
+                Proximos agendamentos
               </h2>
 
               <div className="px-3 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden lg:[&::-webkit-scrollbar]:block lg:pb-4 scrollbar-modify">
