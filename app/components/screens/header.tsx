@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
 import Image from "next/image";
-import { Card, CardContent } from "./ui/card";
-import { Button } from "./ui/button";
+import { Card, CardContent } from "../ui/card";
+import { Button } from "../ui/button";
 import { MenuIcon } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import SideMenu from "./side-menu";
 import Link from "next/link";
 import { useEffect } from "react";
@@ -31,8 +31,8 @@ const Header = () => {
   return (
     <Card className="rounded-none lg:hidden">
       <CardContent className="p-5 flex items-center justify-between">
-        <Link href={"/"} >
-        <Image src="/logo.png" alt="dapper date" height={22} width={120} />
+        <Link href={"/"}>
+          <Image src="/logo.png" alt="dapper date" height={22} width={120} />
         </Link>
 
         <Sheet>

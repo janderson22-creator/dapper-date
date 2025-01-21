@@ -1,6 +1,6 @@
 "use client";
 
-import Header from "../components/header";
+import Header from "../components/screens/header";
 import BookingItem from "../components/booking-item";
 import { Key, useCallback, useEffect, useState } from "react";
 import { Booking } from "@prisma/client";

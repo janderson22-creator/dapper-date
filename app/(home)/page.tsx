@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import Header from "../components/header";
+import Header from "../components/screens/header";
 import { ptBR } from "date-fns/locale";
 import Search from "./components/search";
 import BookingItem from "../components/booking-item";

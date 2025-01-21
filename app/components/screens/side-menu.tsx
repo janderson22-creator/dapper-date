@@ -7,9 +7,9 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "./ui/sheet";
-import { Avatar, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
+} from "../ui/sheet";
+import { Avatar, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
 import {
   CalendarIcon,
   GanttChartSquare,
@@ -34,7 +34,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "./ui/alert-dialog";
+} from "../ui/alert-dialog";
 
 const SideMenu = () => {
   const router = useRouter();

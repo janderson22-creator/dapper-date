@@ -1,6 +1,6 @@
 "use client";
 import EditProfile from "@/app/admin/profile/components/edit-profile";
-import SideMenu from "@/app/components/side-menu";
+import SideMenu from "@/app/components/screens/side-menu";
 import { Button } from "@/app/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/app/components/ui/sheet";
 import { Establishment } from "@prisma/client";

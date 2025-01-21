@@ -1,6 +1,6 @@
 import { Key } from "react";
 import EstablishmentItem from "../(home)/components/establishment-item";
-import Header from "../components/header";
+import Header from "../components/screens/header";
 import { db } from "../lib/prisma";
 import { Establishment } from "@prisma/client";
 import { redirect } from "next/navigation";

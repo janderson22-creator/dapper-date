@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
-import Footer from "./components/footer";
+import Footer from "./components/screens/footer";
 import AuthProvider from "./providers/auth";
 import { Toaster } from "./components/ui/sonner";
 

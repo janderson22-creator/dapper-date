@@ -22,19 +22,20 @@ model User {
 }
 
 model Establishment {
-  id                 String        @id @default(uuid())
+  id                 String              @id @default(uuid())
   name               String
   address            String
   imageUrl           String
   description        String
   phoneNumber        String
-  slug               String        @unique
-  averageTimeService Int           @default(30)
+  slug               String              @unique
+  averageTimeService Int                 @default(30)
   admin              Admin?
   services           Service[]
   bookings           Booking[]
   openingHours       OpeningHour[]
   employees          Employee[]
+  ScheduleException  ScheduleException[]
 }
 
 model Admin {
@@ -54,6 +55,18 @@ model Employee {
   establishmentId String
   establishment   Establishment @relation(fields: [establishmentId], references: [id])
   bookings        Booking[]
+}
+
+model ScheduleException {
+  id        String   @id @default(uuid())
+  date      DateTime
+  startTime String?
+  endTime   String?
+  reason    String?
+  createdAt DateTime @default(now())
+
+  establishmentId String
+  establishment   Establishment @relation(fields: [establishmentId], references: [id])
 }
 
 model OpeningHour {

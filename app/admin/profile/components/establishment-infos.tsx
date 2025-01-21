@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { updateOpeningHours } from "../../actions/opening-hours/update-opening-hour";
 import EditHourOpening from "./edit-hour-opening";
 import { DAYS_OF_WEEK_ORDER } from "@/app/utils/daysOfWeek";
-import { updateEstablishment } from "../../actions/establishment-info/update-establishment";
+import { ScheduleException } from "./scheduleException";
 
 interface Props {
   establishment: Establishment;
@@ -123,7 +123,11 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
       </div>
 
       <div className="pb-12">
-        <p className="text-gray-400 font-bold uppercase">HORÁRIOS</p>
+        <p className="text-gray-400 font-bold uppercase mb-5">
+          dias de funcionamento e horários
+        </p>
+
+        <ScheduleException />
 
         {sortedOpeningHours.map((item, key) => (
           <Sheet

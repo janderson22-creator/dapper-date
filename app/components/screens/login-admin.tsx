@@ -1,11 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { SheetContent } from "./ui/sheet";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { SheetContent } from "../ui/sheet";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
-import { getAdmin } from "../admin/actions/get-admin";
+import { getAdmin } from "../../admin/actions/get-admin";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Admin } from "@prisma/client";
