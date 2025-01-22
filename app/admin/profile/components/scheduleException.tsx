@@ -1,15 +1,32 @@
 "use client";
 
 import { Button } from "@/app/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/app/components/ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTrigger,
+} from "@/app/components/ui/sheet";
 import { useState } from "react";
 import { times } from "../../utils/hoursOfDay";
 import { Input } from "@/app/components/ui/input";
 import { SelectOptions } from "@/app/components/select";
 import { DatePicker } from "@/app/components/datePicker";
 import { Booking, Employee, Establishment, OpeningHour } from "@prisma/client";
-import { getBookingsByEmployee } from "../../actions/booking/get-bookings-by-employee";
 import { DAYS_OF_WEEK_ORDER } from "@/app/utils/daysOfWeek";
+import { getBookingsByEmployee } from "../../actions/booking/get-bookings-by-employee-id";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/app/components/ui/alert-dialog";
+import { Card, CardContent } from "@/app/components/ui/card";
 
 type Props = {
   establishment: Establishment;
@@ -26,6 +43,10 @@ export const ScheduleException = ({ establishment }: Props) => {
   const [selectedFinalTime, setSelectedFinalTime] = useState<string>("");
   const [reason, setReason] = useState<string>();
   const [employeesSelected, setEmployeesSelected] = useState<string[]>([]);
+  const [bookingsToSendMessage, setBookingsToSendMessage] =
+    useState<Booking[]>();
+  const [startOfShift, setStartOfShift] = useState<Date>();
+  const [endOfShift, setEndOfShift] = useState<Date>();
 
   const shiftOptions = ["Dia todo", "Manha", "Tarde"];
   const options = ["Turno", "Horário"];
@@ -40,10 +61,15 @@ export const ScheduleException = ({ establishment }: Props) => {
     });
   };
 
+  const parseTime = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    const date = new Date(currentDate);
+    date.setHours(hours, minutes, 0, 0);
+    return date;
+  };
+
   const submitClick = () => {
     const dayOfWeek = DAYS_OF_WEEK_ORDER[currentDate.getDay()];
-
-    // Encontrar o horário de funcionamento do estabelecimento para o dia selecionado
     const openingHourBySelectedDay = establishment.openingHours.find(
       (oh: OpeningHour) => oh.dayOfWeek === dayOfWeek
     );
@@ -55,42 +81,33 @@ export const ScheduleException = ({ establishment }: Props) => {
       return;
     }
 
-    // Parse dos horários do OpeningHour
     const { startTime, endTime, pauseAt, backAt } = openingHourBySelectedDay;
 
-    // Função para converter strings de horário ("HH:mm") em objetos Date
-    const parseTime = (time: string) => {
-      const [hours, minutes] = time.split(":").map(Number);
-      const date = new Date(currentDate);
-      date.setHours(hours, minutes, 0, 0);
-      return date;
-    };
+    let startOfShift: Date = parseTime(startTime);
+    let endOfShift: Date = parseTime(endTime);
 
-    // Inicializar as variáveis com valores padrão
-    let startOfShift: Date = parseTime(startTime); // Padrão: início do dia
-    let endOfShift: Date = parseTime(endTime); // Padrão: fim do dia
-
-    // Lógica para definir os horários com base no turno
-    if (shiftOptionSelected === "Manha") {
-      // Manhã: do horário de abertura até o início da pausa
-      endOfShift = pauseAt ? parseTime(pauseAt) : parseTime(endTime); // Usa pausa, se disponível
-    } else if (shiftOptionSelected === "Tarde") {
-      // Tarde: do retorno da pausa até o horário de fechamento
-      startOfShift = backAt ? parseTime(backAt) : parseTime(startTime); // Usa retorno, se disponível
+    if (optionSelected === "Turno") {
+      if (shiftOptionSelected === "Manha") {
+        endOfShift = pauseAt ? parseTime(pauseAt) : parseTime(endTime);
+      } else if (shiftOptionSelected === "Tarde") {
+        startOfShift = backAt ? parseTime(backAt) : parseTime(startTime);
+      }
+    } else {
+      startOfShift = parseTime(selectedInitialTime);
+      endOfShift = parseTime(selectedFinalTime);
     }
 
-    console.log("SHIFT OPTION SELECTED", shiftOptionSelected);
-    console.log("START OF SHIFT", startOfShift);
-    console.log("END OF SHIFT", endOfShift);
-
-    // Chamar a função de backend com os horários calculados
     getBookingsByEmployee({
       establishmentId: establishment.id,
       employeesId: employeesSelected,
-      initialDate: startOfShift, // Passe apenas o início do turno ou ajuste o backend para intervalos
+      initialDate: startOfShift,
       endDate: endOfShift,
     })
-      .then((r) => console.log(r))
+      .then((r) => {
+        setBookingsToSendMessage(r),
+          setStartOfShift(startOfShift),
+          setEndOfShift(endOfShift);
+      })
       .catch((error) => console.error("Error fetching bookings:", error));
   };
 
@@ -190,11 +207,50 @@ export const ScheduleException = ({ establishment }: Props) => {
           />
         </div>
 
-        <div className="mx-auto mt-4">
-          <Button onClick={submitClick} type="submit" className="w-full">
-            Adicionar exceção
-          </Button>
-        </div>
+        <AlertDialog>
+          <AlertDialogTrigger className="mx-auto mt-4" asChild>
+            <Button onClick={submitClick} className="w-full">
+              Adicionar exceção
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="w-[90%] rounded-lg">
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Adicionar exceção em um dia de trabalho
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {bookingsToSendMessage?.length
+                  ? "Existem agendamentos para esse horário selecionado, tem certeza que deseja adicionar essa exceção? os agendamentos serão cancelados e os usuarios serão notificados pelo whatsapp."
+                  : "Tem certeza que deseja adicionar essa exceção, nenhum cliente será impactado pois não existe nenhum agendamento para o horário selecionado."}
+                <Card>
+                  <CardContent className="">
+                    <div>
+                      <p>dia: {currentDate.getDate()}</p>
+                      {startOfShift && endOfShift && (
+                        <>
+                          <p>inicia: {startOfShift.getHours()}</p>
+                          <p>termin: {endOfShift.getHours()}</p>
+                        </>
+                      )}
+                      <p>motivo: {reason}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-row gap-3">
+              <AlertDialogCancel className="w-full mt-0">
+                Voltar
+              </AlertDialogCancel>
+
+              <SheetClose asChild>
+                <AlertDialogAction className="w-full" onClick={() => {}}>
+                  Confirmar
+                </AlertDialogAction>
+              </SheetClose>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </SheetContent>
     </Sheet>
   );
