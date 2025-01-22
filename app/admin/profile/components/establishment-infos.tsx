@@ -127,7 +127,7 @@ const EstablishmentAdminInfo: React.FC<Props> = ({ establishment }) => {
           dias de funcionamento e horários
         </p>
 
-        <ScheduleException />
+        <ScheduleException establishment={establishment} />
 
         {sortedOpeningHours.map((item, key) => (
           <Sheet

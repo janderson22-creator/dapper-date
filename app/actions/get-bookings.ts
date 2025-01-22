@@ -4,9 +4,10 @@ import { getServerSession } from "next-auth";
 import { db } from "../lib/prisma";
 import { authOptions } from "../lib/auth";
 import { redirect } from "next/navigation";
+import { Session } from "@prisma/client";
 
 export const getBookings = async () => {
-  const session = await getServerSession(authOptions);
+  const session: Session = await getServerSession(authOptions);
   if (!session?.user) {
     return redirect("/");
   }
@@ -14,7 +15,7 @@ export const getBookings = async () => {
   const [confirmedBookings, finishedBookings] = await Promise.all([
     db.booking.findMany({
       where: {
-        userId: (session.user as any).id,
+        userId: session.user.id,
         date: {
           gte: new Date(),
         },
@@ -28,7 +29,7 @@ export const getBookings = async () => {
     }),
     db.booking.findMany({
       where: {
-        userId: (session.user as any).id,
+        userId: session.user.id,
         date: {
           lt: new Date(),
         },

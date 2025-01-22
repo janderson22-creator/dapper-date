@@ -19,6 +19,7 @@ const Profile: React.FC<ProfileProps> = async ({ params }) => {
       id: params.id,
     },
     include: {
+      employees: true,
       openingHours: true,
     },
   });
@@ -29,7 +30,7 @@ const Profile: React.FC<ProfileProps> = async ({ params }) => {
 
   return (
     <div>
-      <EstablishmentHeader admin={true} establishment={establishment} />
+      <EstablishmentHeader admin establishment={establishment} />
 
       <EstablishmentAdminInfo establishment={establishment} />
     </div>

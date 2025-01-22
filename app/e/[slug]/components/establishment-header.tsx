@@ -71,6 +71,7 @@ const EstablishmentHeader: React.FC<EstablishmentInfoProps> = ({
           fill
           alt={establishment?.name || ""}
           className="object-cover lg:object-fill opacity-75"
+          priority
         />
       </div>
 

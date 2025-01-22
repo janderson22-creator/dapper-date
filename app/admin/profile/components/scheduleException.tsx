@@ -1,15 +1,23 @@
 "use client";
 
 import { Button } from "@/app/components/ui/button";
-import { Calendar } from "@/app/components/ui/calendar";
 import { Sheet, SheetContent, SheetTrigger } from "@/app/components/ui/sheet";
-import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 import { times } from "../../utils/hoursOfDay";
 import { Input } from "@/app/components/ui/input";
 import { SelectOptions } from "@/app/components/select";
+import { DatePicker } from "@/app/components/datePicker";
+import { Booking, Employee, Establishment, OpeningHour } from "@prisma/client";
+import { getBookingsByEmployee } from "../../actions/booking/get-bookings-by-employee";
+import { DAYS_OF_WEEK_ORDER } from "@/app/utils/daysOfWeek";
 
-export const ScheduleException = () => {
+type Props = {
+  establishment: Establishment;
+};
+
+export const ScheduleException = ({ establishment }: Props) => {
+  const employees: Employee[] = establishment.employees;
+  const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [shiftOptionSelected, setShiftOptionSelected] =
     useState<ShiftOptions>("Dia todo");
@@ -17,56 +25,114 @@ export const ScheduleException = () => {
   const [selectedInitialTime, setSelectedInitialTime] = useState<string>("");
   const [selectedFinalTime, setSelectedFinalTime] = useState<string>("");
   const [reason, setReason] = useState<string>();
+  const [employeesSelected, setEmployeesSelected] = useState<string[]>([]);
+
   const shiftOptions = ["Dia todo", "Manha", "Tarde"];
   const options = ["Turno", "Horário"];
 
+  const toggleEmployeeSelection = (employeeId: string) => {
+    setEmployeesSelected((prev) => {
+      if (prev.includes(employeeId)) {
+        return prev.filter((id) => id !== employeeId);
+      } else {
+        return [...prev, employeeId];
+      }
+    });
+  };
+
+  const submitClick = () => {
+    const dayOfWeek = DAYS_OF_WEEK_ORDER[currentDate.getDay()];
+
+    // Encontrar o horário de funcionamento do estabelecimento para o dia selecionado
+    const openingHourBySelectedDay = establishment.openingHours.find(
+      (oh: OpeningHour) => oh.dayOfWeek === dayOfWeek
+    );
+
+    if (!openingHourBySelectedDay) {
+      console.error(
+        "Horário de funcionamento não encontrado para o dia selecionado."
+      );
+      return;
+    }
+
+    // Parse dos horários do OpeningHour
+    const { startTime, endTime, pauseAt, backAt } = openingHourBySelectedDay;
+
+    // Função para converter strings de horário ("HH:mm") em objetos Date
+    const parseTime = (time: string) => {
+      const [hours, minutes] = time.split(":").map(Number);
+      const date = new Date(currentDate);
+      date.setHours(hours, minutes, 0, 0);
+      return date;
+    };
+
+    // Inicializar as variáveis com valores padrão
+    let startOfShift: Date = parseTime(startTime); // Padrão: início do dia
+    let endOfShift: Date = parseTime(endTime); // Padrão: fim do dia
+
+    // Lógica para definir os horários com base no turno
+    if (shiftOptionSelected === "Manha") {
+      // Manhã: do horário de abertura até o início da pausa
+      endOfShift = pauseAt ? parseTime(pauseAt) : parseTime(endTime); // Usa pausa, se disponível
+    } else if (shiftOptionSelected === "Tarde") {
+      // Tarde: do retorno da pausa até o horário de fechamento
+      startOfShift = backAt ? parseTime(backAt) : parseTime(startTime); // Usa retorno, se disponível
+    }
+
+    console.log("SHIFT OPTION SELECTED", shiftOptionSelected);
+    console.log("START OF SHIFT", startOfShift);
+    console.log("END OF SHIFT", endOfShift);
+
+    // Chamar a função de backend com os horários calculados
+    getBookingsByEmployee({
+      establishmentId: establishment.id,
+      employeesId: employeesSelected,
+      initialDate: startOfShift, // Passe apenas o início do turno ou ajuste o backend para intervalos
+      endDate: endOfShift,
+    })
+      .then((r) => console.log(r))
+      .catch((error) => console.error("Error fetching bookings:", error));
+  };
+
   return (
     <Sheet>
-      <SheetTrigger>
+      <SheetTrigger asChild>
         <Button
           variant="default"
           className="w-full font-bold text-3x1 mb-5 tracking-widest flex items-center"
         >
-          <p className="ml-auto">Adicionar exceção/imprevisto em um dia</p>
+          Adicionar exceção/imprevisto em um dia
         </Button>
       </SheetTrigger>
 
       <SheetContent className="rounded-t-lg w-full px-4" side="bottom">
-        <p className="text-sm text-gray-400 py-2">
-          Escolha a data em que não hávera expediente
-        </p>
-        <div className="py-2 h-full">
-          <Calendar
-            className="h-full px-0"
-            mode="single"
-            selected={currentDate}
-            onSelect={(date) => date && setCurrentDate(date)}
-            locale={ptBR}
-            fromDate={new Date()}
-            styles={{
-              head_cell: {
-                width: "100%",
-                textTransform: "capitalize",
-              },
-              cell: {
-                width: "100%",
-              },
-              button: {
-                width: "100%",
-              },
-              nav_button_previous: {
-                width: "32px",
-                height: "32px",
-              },
-              nav_button_next: {
-                width: "32px",
-                height: "32px",
-              },
-              caption: {
-                textTransform: "capitalize",
-              },
-            }}
+        <div className="py-4 h-full">
+          <DatePicker
+            isOpen={sheetIsOpen}
+            setIsOpen={setSheetIsOpen}
+            currentDate={currentDate}
+            setCurrentDate={setCurrentDate}
           />
+        </div>
+
+        <p className="text-sm text-gray-400">
+          Selecione um ou mais funcionários:
+        </p>
+        <div className="flex flex-wrap gap-2 mt-2 mb-4">
+          {employees.map((employee) => (
+            <Button
+              key={employee.id}
+              variant={
+                employeesSelected.includes(employee.id)
+                  ? "default"
+                  : "secondary"
+              }
+              onClick={() => toggleEmployeeSelection(employee.id)}
+              className="capitalize"
+            >
+              {employee.name}
+            </Button>
+          ))}
         </div>
 
         <p className="text-sm text-gray-400">Turno ou horário especifico?</p>
@@ -121,12 +187,13 @@ export const ScheduleException = () => {
             id="reason"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            required
           />
         </div>
 
         <div className="mx-auto mt-4">
-          <Button className="w-full">Adicionar exceção</Button>
+          <Button onClick={submitClick} type="submit" className="w-full">
+            Adicionar exceção
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
