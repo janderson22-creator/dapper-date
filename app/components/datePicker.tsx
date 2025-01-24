@@ -1,10 +1,4 @@
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/app/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/app/components/ui/sheet";
 import { Button } from "./ui/button";
 import { ArrowDown } from "lucide-react";
 import { Calendar } from "./ui/calendar";
@@ -16,14 +10,10 @@ type Props = {
   setIsOpen: (isOpen: boolean) => void;
   currentDate: Date;
   setCurrentDate: (date: Date) => void;
+  dontShowPast?: boolean;
 };
 
-export const DatePicker = ({
-  isOpen,
-  setIsOpen,
-  currentDate,
-  setCurrentDate,
-}: Props) => {
+export const DatePicker = ({ isOpen, setIsOpen, currentDate, setCurrentDate, dontShowPast }: Props) => {
   const dateClick = (date: Date | undefined) => {
     if (!date) return;
 
@@ -34,10 +24,7 @@ export const DatePicker = ({
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button
-          variant="secondary"
-          className="w-full font-bold text-3x1 tracking-widest flex items-center"
-        >
+        <Button variant="secondary" className="w-full font-bold text-3x1 tracking-widest flex items-center">
           <p className="ml-auto">{format(currentDate, "dd/MM/yyyy")}</p>
           <ArrowDown size={18} className="ml-auto" />
         </Button>
@@ -60,6 +47,7 @@ export const DatePicker = ({
             selected={currentDate}
             onSelect={dateClick}
             locale={ptBR}
+            fromDate={(dontShowPast && new Date()) || undefined}
             styles={{
               head_cell: {
                 width: "100%",
