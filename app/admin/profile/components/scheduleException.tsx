@@ -125,10 +125,16 @@ export const ScheduleException = ({ establishment }: Props) => {
       toast.success("Exceções criadas com sucesso!", {
         duration: 4000,
       });
+
+      if (bookingsToSendMessage?.length) {
+        console.log(bookingsToSendMessage);
+
+        // TODO: GET BOOKINGS.USER.NUMBERS AND SEND MESSAGE TELLING ABOUT DE BOOKING CANCEL
+      }
     } catch (error) {
       console.error("Erro ao criar exceções:", error);
     }
-  }, [startOfShift, endOfShift, reason, employeesSelected, establishment.id, currentDate]);
+  }, [startOfShift, endOfShift, employeesSelected, bookingsToSendMessage, currentDate, reason, establishment.id]);
 
   return (
     <Sheet>

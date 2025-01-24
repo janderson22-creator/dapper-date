@@ -1,7 +1,6 @@
 "use server";
 
 import { db } from "../../../lib/prisma";
-import { startOfDay, endOfDay } from "date-fns";
 
 type Props = {
   establishmentId: string;
@@ -10,12 +9,7 @@ type Props = {
   endDate: Date;
 };
 
-export const getBookingsByEmployee = async ({
-  establishmentId,
-  employeesId,
-  initialDate,
-  endDate,
-}: Props) => {
+export const getBookingsByEmployee = async ({ establishmentId, employeesId, initialDate, endDate }: Props) => {
   const bookings = await db.booking.findMany({
     where: {
       establishmentId,
@@ -26,6 +20,9 @@ export const getBookingsByEmployee = async ({
         gte: initialDate,
         lt: endDate,
       },
+    },
+    include: {
+      user: true,
     },
   });
 
